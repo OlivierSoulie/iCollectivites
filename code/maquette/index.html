@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>CIMTEA — Configurateur Columbarium</title>
+  <style>
+    :root {
+      --bg: #f2f2f7;
+      --glass: rgba(255,255,255,0.72);
+      --glass-border: rgba(255,255,255,0.45);
+      --glass-strong: rgba(255,255,255,0.85);
+      --primary: #007aff;
+      --primary-light: rgba(0,122,255,0.12);
+      --primary-dark: #0056b3;
+      --text: #1c1c1e;
+      --text-secondary: #6e6e73;
+      --text-tertiary: #aeaeb2;
+      --separator: rgba(60,60,67,0.1);
+      --success: #34c759;
+      --orange: #ff9500;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --radius-xs: 8px;
+      --sidebar-width: 380px;
+    }
+
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+      background: #1a1a1e;
+      color: var(--text);
+      height: 100vh; height: 100dvh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* ============================================
+       VIEWPORT 3D — Zone principale (gauche)
+       ============================================ */
+    .viewport {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #2c2c30 0%, #1a1a1e 50%, #0d0d0f 100%);
+      overflow: hidden;
+    }
+
+    .viewport-bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    .viewport-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      color: rgba(255,255,255,0.6);
+    }
+
+    .viewport-content .placeholder-icon {
+      font-size: 120px;
+      opacity: 0.3;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .viewport-content .placeholder-text {
+      font-size: 17px;
+      font-weight: 500;
+      opacity: 0.5;
+    }
+
+    .viewport-content .placeholder-hint {
+      font-size: 13px;
+      opacity: 0.3;
+      margin-top: 8px;
+    }
+
+    /* Viewport toolbar (bas gauche) */
+    .viewport-toolbar {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .vp-btn {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.7);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .vp-btn:active { background: rgba(255,255,255,0.2); }
+
+    /* Viewport info (bas droite) */
+    .viewport-info {
+      position: absolute;
+      bottom: 20px;
+      right: calc(var(--sidebar-width) + 20px);
+      display: flex;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .vp-info-chip {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      padding: 8px 14px;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .vp-info-chip strong {
+      color: rgba(255,255,255,0.95);
+      font-weight: 600;
+    }
+
+    /* Logo CIMTEA (haut gauche du viewport) */
+    .viewport-logo {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      z-index: 10;
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    /* ============================================
+       SIDEBAR — Panneau de configuration (droite)
+       ============================================ */
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh; height: 100dvh;
+      background: var(--glass-strong);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border-left: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* --- Breadcrumb / Fil d'Ariane --- */
+    .breadcrumb {
+      padding: 16px 20px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-height: 48px;
+    }
+
+    .breadcrumb-item {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      padding: 4px 0;
+      white-space: nowrap;
+      transition: color 0.15s;
+    }
+
+    .breadcrumb-item:hover { color: var(--primary); }
+    .breadcrumb-item.active {
+      color: var(--text);
+      font-weight: 600;
+      cursor: default;
+    }
+
+    .breadcrumb-item.completed { color: var(--primary); }
+
+    .breadcrumb-sep {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      opacity: 0.5;
+    }
+
+    /* --- Sidebar header --- */
+    .sidebar-header {
+      padding: 12px 20px 0;
+    }
+
+    .sidebar-header h2 {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.15;
+    }
+
+    .sidebar-header p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    /* --- Sidebar scroll area --- */
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 20px 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar { display: none; }
+
+    /* --- Step containers --- */
+    .step {
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+    .step.active { display: block; }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(16px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* --- Option cards --- */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .options.grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .option-card {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .option-card:active { transform: scale(0.98); }
+
+    .option-card.selected {
+      background: var(--primary-light);
+      border-color: var(--primary);
+    }
+
+    .option-card .opt-radio {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--text-tertiary);
+      flex-shrink: 0;
+      margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .option-card.selected .opt-radio {
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .option-card .opt-radio::after {
+      content: '';
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: white;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .option-card.selected .opt-radio::after { opacity: 1; }
+
+    .opt-content { flex: 1; }
+
+    .opt-content h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .opt-content p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+
+    .opt-badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-top: 6px;
+    }
+
+    /* Grid cards (larger, icon based) */
+    .options.grid-2 .option-card {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 20px 12px;
+      gap: 8px;
+    }
+
+    .options.grid-2 .opt-radio { display: none; }
+
+    .options.grid-2 .option-card .opt-icon {
+      font-size: 36px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .options.grid-2 .option-card.selected {
+      box-shadow: 0 0 0 1px var(--primary);
+    }
+
+    /* --- Condition note --- */
+    .condition-note {
+      background: rgba(255,149,0,0.08);
+      border: 1px solid rgba(255,149,0,0.2);
+      border-radius: var(--radius-xs);
+      padding: 10px 12px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--orange);
+      line-height: 1.35;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    /* --- Sidebar footer (button) --- */
+    .sidebar-footer {
+      padding: 12px 20px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--separator);
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      height: 50px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      flex: 1;
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:disabled {
+      background: var(--text-tertiary);
+      cursor: not-allowed;
+    }
+
+    .btn-primary.btn-success { background: var(--success); }
+
+    .btn-secondary {
+      width: 50px;
+      background: var(--bg);
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .btn-secondary.hidden { display: none; }
+
+    .btn-secondary svg {
+      width: 12px; height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ============================================
+       RECAP (inside sidebar)
+       ============================================ */
+    .recap-capacity {
+      background: linear-gradient(135deg, var(--primary), #5856d6);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      text-align: center;
+      color: white;
+      margin-bottom: 16px;
+    }
+
+    .recap-capacity .number {
+      font-size: 48px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .recap-capacity .unit {
+      font-size: 14px;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+
+    .recap-section {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+    }
+
+    .recap-section h4 {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .recap-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--separator);
+      font-size: 15px;
+    }
+
+    .recap-row:last-child { border-bottom: none; }
+    .recap-row .label { color: var(--text-secondary); }
+    .recap-row .value { font-weight: 500; color: var(--text); }
+
+    /* ============================================
+       ACCUEIL (fullscreen, no sidebar content)
+       ============================================ */
+    .welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100%;
+      padding: 40px 20px;
+    }
+
+    .welcome .brand-mark {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .welcome h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.15;
+    }
+
+    .welcome p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .welcome .features {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .welcome .feature-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      text-align: left;
+    }
+
+    .welcome .feature-row .f-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+      width: 40px;
+      text-align: center;
+    }
+
+    .welcome .feature-row .f-text {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .welcome .feature-row .f-text span {
+      display: block;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-top: 1px;
+    }
+
+    /* ============================================
+       HIDDEN utility
+       ============================================ */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- ========== VIEWPORT 3D ========== -->
+  <div class="viewport">
+    <div class="viewport-bg-grid"></div>
+    <div class="viewport-logo">CIMTEA</div>
+
+    <div class="viewport-content" id="viewportContent">
+      <div class="placeholder-icon">&#9965;</div>
+      <div class="placeholder-text">Visualisation 3D</div>
+      <div class="placeholder-hint">Le rendu se mettra a jour a chaque selection</div>
+    </div>
+
+    <!-- Viewport tools -->
+    <div class="viewport-toolbar">
+      <button class="vp-btn" title="Rotation">&#8635;</button>
+      <button class="vp-btn" title="Zoom +">+</button>
+      <button class="vp-btn" title="Zoom -">&minus;</button>
+      <button class="vp-btn" title="Recentrer">&#9678;</button>
+    </div>
+
+    <!-- Info chips -->
+    <div class="viewport-info" id="viewportInfo">
+      <div class="vp-info-chip" id="chipCapacity"><strong>0</strong> urnes</div>
+      <div class="vp-info-chip" id="chipDimensions">Selectionnez une configuration</div>
+    </div>
+  </div>
+
+  <!-- ========== SIDEBAR ========== -->
+  <div class="sidebar">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb" id="breadcrumb"></div>
+
+    <!-- Scrollable content -->
+    <div class="sidebar-scroll">
+
+      <!-- ===== ACCUEIL ===== -->
+      <div class="step active" id="step-0">
+        <div class="welcome">
+          <div class="brand-mark">CIMTEA</div>
+          <h1>Configurateur<br>Columbarium</h1>
+          <p>Composez votre columbarium Emeraude en quelques etapes.</p>
+          <div class="features">
+            <div class="feature-row">
+              <span class="f-icon">&#9645;</span>
+              <span class="f-text">Disposition<span>Rectangulaire ou angle</span></span>
+            </div>
+            <div class="feature-row">
+              <span class="f-icon">&#9638;</span>
+              <span class="f-text">Modules<span>7, 10 ou 12 cases par module</span></span>
+            </div>
+            <div class="feature-row">
+              <span class="f-icon">&#9878;</span>
+              <span class="f-text">Accessoires<span>Bancs, espace de recueillement</span></span>
+            </div>
+            <div class="feature-row">
+              <span class="f-icon">&#9998;</span>
+              <span class="f-text">Devis gratuit<span>Recapitulatif et demande en ligne</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ETAPE 1 : Disposition ===== -->
+      <div class="step" id="step-1">
+        <div class="sidebar-header">
+          <h2>Disposition</h2>
+          <p>Type d'implantation dans votre cimetiere.</p>
+        </div>
+        <div style="height:16px"></div>
+        <div class="options grid-2">
+          <div class="option-card" onclick="select(1,'rectangulaire')" id="opt-1-rectangulaire">
+            <span class="opt-icon">&#9645;</span>
+            <div class="opt-content">
+              <h3>Rectangulaire</h3>
+              <p>Implantation lineaire</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(1,'angle')" id="opt-1-angle">
+            <span class="opt-icon">&#8735;</span>
+            <div class="opt-content">
+              <h3>Angle (L)</h3>
+              <p>Implantation en equerre</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ETAPE 2 : Module droit ===== -->
+      <div class="step" id="step-2">
+        <div class="sidebar-header">
+          <h2>Module droit</h2>
+          <p>Nombre de cases du module principal.</p>
+        </div>
+        <div style="height:16px"></div>
+        <div class="options">
+          <div class="option-card" onclick="select(2,'7')" id="opt-2-7">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>7 cases</h3>
+              <p>21 urnes &bull; 211 cm</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(2,'10')" id="opt-2-10">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>10 cases</h3>
+              <p>30 urnes &bull; 258 cm</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(2,'12')" id="opt-2-12">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>12 cases</h3>
+              <p>36 urnes &bull; 303 cm</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ETAPE 3 : Module gauche ===== -->
+      <div class="step" id="step-3">
+        <div class="sidebar-header">
+          <h2>Module gauche</h2>
+          <p>Ajoutez un second module symetrique.</p>
+        </div>
+        <div style="height:16px"></div>
+        <div class="options">
+          <div class="option-card" onclick="select(3,'aucun')" id="opt-3-aucun">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Aucun</h3>
+              <p>Module simple uniquement</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(3,'7')" id="opt-3-7">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>7 cases</h3>
+              <p>Module miroir &bull; 21 urnes</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(3,'10')" id="opt-3-10">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>10 cases</h3>
+              <p>Module miroir &bull; 30 urnes</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(3,'12')" id="opt-3-12">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>12 cases</h3>
+              <p>Module miroir &bull; 36 urnes</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ETAPE 4 : Colonne ===== -->
+      <div class="step" id="step-4">
+        <div class="sidebar-header">
+          <h2>Colonne decorative</h2>
+          <p>Colonne en granit sur le cote droit du module.</p>
+        </div>
+        <div style="height:16px"></div>
+        <div class="options grid-2">
+          <div class="option-card" onclick="select(4,'oui')" id="opt-4-oui">
+            <span class="opt-icon">&#9612;</span>
+            <div class="opt-content">
+              <h3>Avec</h3>
+              <p>Colonne laterale</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(4,'non')" id="opt-4-non">
+            <span class="opt-icon">&#9644;</span>
+            <div class="opt-content">
+              <h3>Sans</h3>
+              <p>Module seul</p>
+            </div>
+          </div>
+        </div>
+        <div class="condition-note">
+          <span>&#9888;</span>
+          <span>Option disponible uniquement en rectangulaire, 7 cases, sans module gauche.</span>
+        </div>
+      </div>
+
+      <!-- ===== ETAPE 5 : Banc droit ===== -->
+      <div class="step" id="step-5">
+        <div class="sidebar-header">
+          <h2>Banc droit</h2>
+          <p>Banc place du cote droit.</p>
+        </div>
+        <div style="height:16px"></div>
+        <div class="options">
+          <div class="option-card" onclick="select(5,'aucun')" id="opt-5-aucun">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Aucun</h3>
+              <p>Pas de banc a droite</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(5,'berlin')" id="opt-5-berlin">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Banc Berlin</h3>
+              <p>Design contemporain</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(5,'saphir')" id="opt-5-saphir">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Banc Saphir 120</h3>
+              <p>120 cm, gamme Saphir</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ETAPE 6 : Banc gauche ===== -->
+      <div class="step" id="step-6">
+        <div class="sidebar-header">
+          <h2>Banc gauche</h2>
+          <p>Banc place du cote gauche.</p>
+        </div>
+        <div style="height:16px"></div>
+        <div class="options">
+          <div class="option-card" onclick="select(6,'aucun')" id="opt-6-aucun">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Aucun</h3>
+              <p>Pas de banc a gauche</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(6,'berlin')" id="opt-6-berlin">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Banc Berlin</h3>
+              <p>Design contemporain</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(6,'saphir')" id="opt-6-saphir">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Banc Saphir 120</h3>
+              <p>120 cm, gamme Saphir</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ETAPE 7 : Espace de recueillement ===== -->
+      <div class="step" id="step-7">
+        <div class="sidebar-header">
+          <h2>Espace de recueillement</h2>
+          <p>Monument central entre les modules.</p>
+        </div>
+        <div style="height:16px"></div>
+        <div class="options grid-2">
+          <div class="option-card" onclick="select(7,'aucun')" id="opt-7-aucun">
+            <span class="opt-icon">&#10005;</span>
+            <div class="opt-content">
+              <h3>Aucun</h3>
+              <p>Sans monument</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(7,'idealo')" id="opt-7-idealo">
+            <span class="opt-icon">&#9965;</span>
+            <div class="opt-content">
+              <h3>IDEALO 2023</h3>
+              <p>Monument decoratif</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ETAPE 8 : Caveau ===== -->
+      <div class="step" id="step-8">
+        <div class="sidebar-header">
+          <h2>Caveau enterre</h2>
+          <p>Caveau polymere sous le columbarium.</p>
+        </div>
+        <div style="height:16px"></div>
+        <div class="options">
+          <div class="option-card" onclick="select(8,'aucun')" id="opt-8-aucun">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Aucun</h3>
+              <p>Sans caveau</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(8,'simple-fond')" id="opt-8-simple-fond">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Simple 27 cm avec fond</h3>
+              <p>Caveau polymere ferme</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(8,'simple-sans')" id="opt-8-simple-sans">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Simple 27 cm sans fond</h3>
+              <p>Caveau polymere ouvert</p>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(8,'double')" id="opt-8-double">
+            <span class="opt-radio"></span>
+            <div class="opt-content">
+              <h3>Double 54 cm</h3>
+              <p>Double hauteur</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ETAPE 9 : Recapitulatif ===== -->
+      <div class="step" id="step-9">
+        <div class="sidebar-header">
+          <h2>Recapitulatif</h2>
+          <p>Votre configuration Emeraude.</p>
+        </div>
+        <div style="height:16px"></div>
+
+        <div class="recap-capacity">
+          <div class="number" id="recapUrnes">0</div>
+          <div class="unit">urnes de capacite totale</div>
+        </div>
+
+        <div class="recap-section">
+          <h4>Configuration</h4>
+          <div class="recap-row">
+            <span class="label">Disposition</span>
+            <span class="value" id="recap-disposition">—</span>
+          </div>
+          <div class="recap-row">
+            <span class="label">Module droit</span>
+            <span class="value" id="recap-droit">—</span>
+          </div>
+          <div class="recap-row" id="recap-row-gauche">
+            <span class="label">Module gauche</span>
+            <span class="value" id="recap-gauche">—</span>
+          </div>
+          <div class="recap-row hidden" id="recap-row-colonne">
+            <span class="label">Colonne</span>
+            <span class="value" id="recap-colonne">—</span>
+          </div>
+        </div>
+
+        <div class="recap-section">
+          <h4>Mobilier</h4>
+          <div class="recap-row">
+            <span class="label">Banc droit</span>
+            <span class="value" id="recap-banc-droit">—</span>
+          </div>
+          <div class="recap-row" id="recap-row-banc-gauche">
+            <span class="label">Banc gauche</span>
+            <span class="value" id="recap-banc-gauche">—</span>
+          </div>
+          <div class="recap-row">
+            <span class="label">Recueillement</span>
+            <span class="value" id="recap-recueillement">—</span>
+          </div>
+        </div>
+
+        <div class="recap-section">
+          <h4>Option technique</h4>
+          <div class="recap-row">
+            <span class="label">Caveau</span>
+            <span class="value" id="recap-caveau">—</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /sidebar-scroll -->
+
+    <!-- Footer buttons -->
+    <div class="sidebar-footer">
+      <button class="btn btn-secondary hidden" id="btnBack" onclick="prevStep()">
+        <svg viewBox="0 0 12 18"><polyline points="10,2 2,9 10,16"/></svg>
+      </button>
+      <button class="btn btn-primary" id="btnNext" onclick="nextStep()">Commencer</button>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <script>
+    // ==================== STATE ====================
+    let currentStep = 0;
+    const TOTAL = 9;
+    const choices = {};
+
+    const stepNames = [
+      'Accueil','Disposition','Module droit','Module gauche',
+      'Colonne','Banc droit','Banc gauche','Recueillement','Caveau','Recapitulatif'
+    ];
+
+    const casesUrnes = { '7': 21, '10': 30, '12': 36 };
+
+    const labels = {
+      'rectangulaire':'Rectangulaire','angle':'Angle (L)',
+      'aucun':'Aucun','7':'7 cases','10':'10 cases','12':'12 cases',
+      'oui':'Oui','non':'Non',
+      'berlin':'Banc Berlin','saphir':'Banc Saphir 120',
+      'idealo':'IDEALO 2023',
+      'simple-fond':'Simple 27cm (fond)','simple-sans':'Simple 27cm (ouvert)','double':'Double 54cm'
+    };
+
+    // ==================== BREADCRUMB ====================
+    function buildBreadcrumb() {
+      const bc = document.getElementById('breadcrumb');
+      if (currentStep === 0) { bc.innerHTML = ''; return; }
+
+      const activeSteps = getActiveSteps();
+      let html = '';
+      activeSteps.forEach((s, i) => {
+        if (i > 0) html += '<span class="breadcrumb-sep">&#9656;</span>';
+        const isCurrent = s === currentStep;
+        const isCompleted = choices[s] !== undefined && !isCurrent;
+        let cls = 'breadcrumb-item';
+        if (isCurrent) cls += ' active';
+        else if (isCompleted) cls += ' completed';
+        html += `<span class="${cls}" onclick="goToStep(${s})">${stepNames[s]}</span>`;
+      });
+      bc.innerHTML = html;
+    }
+
+    function getActiveSteps() {
+      const steps = [1, 2, 3];
+      if (showColonne()) steps.push(4);
+      steps.push(5);
+      if (choices[3] && choices[3] !== 'aucun') steps.push(6);
+      steps.push(7, 8, 9);
+      return steps;
+    }
+
+    function goToStep(n) {
+      if (n >= currentStep) return; // can only go back
+      showStep(n);
+    }
+
+    // ==================== SELECTION ====================
+    function select(step, value) {
+      document.querySelectorAll(`#step-${step} .option-card`).forEach(c => c.classList.remove('selected'));
+      document.getElementById(`opt-${step}-${value}`).classList.add('selected');
+      choices[step] = value;
+      updateViewportInfo();
+      updateButton();
+    }
+
+    // ==================== NAVIGATION ====================
+    function nextStep() {
+      if (currentStep === TOTAL) return;
+      let next = currentStep + 1;
+      if (next === 4 && !showColonne()) next = 5;
+      if (next === 6 && (!choices[3] || choices[3] === 'aucun')) next = 7;
+      if (next === TOTAL) buildRecap();
+      showStep(next);
+    }
+
+    function prevStep() {
+      if (currentStep <= 0) return;
+      let prev = currentStep - 1;
+      if (prev === 4 && !showColonne()) prev = 3;
+      if (prev === 6 && (!choices[3] || choices[3] === 'aucun')) prev = 5;
+      if (prev === 0) prev = 0;
+      showStep(prev);
+    }
+
+    function showColonne() {
+      return choices[1] === 'rectangulaire' && choices[2] === '7' && choices[3] === 'aucun';
+    }
+
+    function showStep(n) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById(`step-${n}`).classList.add('active');
+      currentStep = n;
+      updateUI();
+    }
+
+    function updateUI() {
+      // Back button
+      document.getElementById('btnBack').classList.toggle('hidden', currentStep === 0);
+      // Breadcrumb
+      buildBreadcrumb();
+      // Button
+      updateButton();
+      // Scroll to top of sidebar
+      document.querySelector('.sidebar-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateButton() {
+      const btn = document.getElementById('btnNext');
+      if (currentStep === 0) {
+        btn.textContent = 'Commencer';
+        btn.disabled = false;
+        btn.className = 'btn btn-primary';
+      } else if (currentStep === TOTAL) {
+        btn.textContent = 'Demander un devis gratuit';
+        btn.disabled = false;
+        btn.className = 'btn btn-primary btn-success';
+      } else {
+        btn.textContent = 'Continuer';
+        btn.disabled = choices[currentStep] === undefined;
+        btn.className = 'btn btn-primary';
+      }
+    }
+
+    // ==================== VIEWPORT INFO ====================
+    function updateViewportInfo() {
+      const chipCap = document.getElementById('chipCapacity');
+      const chipDim = document.getElementById('chipDimensions');
+
+      let urnes = casesUrnes[choices[2]] || 0;
+      if (choices[3] && choices[3] !== 'aucun') urnes += casesUrnes[choices[3]] || 0;
+
+      chipCap.innerHTML = urnes > 0 ? `<strong>${urnes}</strong> urnes` : '<strong>0</strong> urnes';
+
+      if (choices[1] && choices[2]) {
+        const disp = labels[choices[1]];
+        const mod = labels[choices[2]];
+        let desc = `${disp} &bull; ${mod}`;
+        if (choices[3] && choices[3] !== 'aucun') desc += ` + ${labels[choices[3]]}`;
+        chipDim.innerHTML = desc;
+      } else {
+        chipDim.textContent = 'Selectionnez une configuration';
+      }
+    }
+
+    // ==================== RECAP ====================
+    function buildRecap() {
+      const l = v => labels[v] || v || '—';
+
+      document.getElementById('recap-disposition').textContent = l(choices[1]);
+      document.getElementById('recap-droit').textContent = l(choices[2]);
+
+      const rowG = document.getElementById('recap-row-gauche');
+      if (!choices[3] || choices[3] === 'aucun') {
+        rowG.classList.add('hidden');
+      } else {
+        rowG.classList.remove('hidden');
+        document.getElementById('recap-gauche').textContent = l(choices[3]);
+      }
+
+      const rowC = document.getElementById('recap-row-colonne');
+      if (showColonne() && choices[4]) {
+        rowC.classList.remove('hidden');
+        document.getElementById('recap-colonne').textContent = l(choices[4]);
+      } else {
+        rowC.classList.add('hidden');
+      }
+
+      document.getElementById('recap-banc-droit').textContent = l(choices[5]);
+
+      const rowBG = document.getElementById('recap-row-banc-gauche');
+      if (choices[3] && choices[3] !== 'aucun') {
+        rowBG.classList.remove('hidden');
+        document.getElementById('recap-banc-gauche').textContent = l(choices[6]);
+      } else {
+        rowBG.classList.add('hidden');
+      }
+
+      document.getElementById('recap-recueillement').textContent = l(choices[7]);
+      document.getElementById('recap-caveau').textContent = l(choices[8]);
+
+      let urnes = casesUrnes[choices[2]] || 0;
+      if (choices[3] && choices[3] !== 'aucun') urnes += casesUrnes[choices[3]] || 0;
+      document.getElementById('recapUrnes').textContent = urnes;
+    }
+
+    // ==================== INIT ====================
+    updateUI();
+  </script>
+
+</body>
+</html>
