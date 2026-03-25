@@ -1,0 +1,327 @@
+/* ============================================
+   STYLES COMMUNS — iCollectivites CIMTEA
+   Partage entre tous les ecrans (ADR-001)
+   ============================================ */
+
+/* --- Variables globales --- */
+:root {
+  --bg: #f2f2f7;
+  --glass: rgba(255,255,255,0.72);
+  --glass-border: rgba(255,255,255,0.45);
+  --glass-strong: rgba(255,255,255,0.85);
+  --primary: #007aff;
+  --primary-light: rgba(0,122,255,0.12);
+  --primary-dark: #0056b3;
+  --text: #1c1c1e;
+  --text-secondary: #6e6e73;
+  --text-tertiary: #aeaeb2;
+  --separator: rgba(60,60,67,0.1);
+  --success: #34c759;
+  --orange: #ff9500;
+  --radius: 16px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --sidebar-width: 380px;
+}
+
+/* --- Reset --- */
+* {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  background: #1a1a1e;
+  color: var(--text);
+  height: 100vh; height: 100dvh;
+  overflow: hidden;
+}
+
+/* --- Boutons communs --- */
+.btn {
+  height: 50px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn:active { transform: scale(0.98); }
+
+.btn-primary {
+  flex: 1;
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:disabled {
+  background: var(--text-tertiary);
+  cursor: not-allowed;
+}
+
+.btn-primary.btn-success { background: var(--success); }
+
+.btn-secondary {
+  width: 50px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.btn-secondary.hidden { display: none; }
+
+.btn-secondary svg {
+  width: 12px; height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* --- Option cards (reutilisables) --- */
+.option-card {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.option-card:active { transform: scale(0.98); }
+
+.option-card.selected {
+  background: var(--primary-light);
+  border-color: var(--primary);
+}
+
+.option-card.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.option-card .opt-radio {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--text-tertiary);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+
+.option-card.selected .opt-radio {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.option-card .opt-radio::after {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: white;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.option-card.selected .opt-radio::after { opacity: 1; }
+
+.opt-content { flex: 1; }
+
+.opt-content h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.opt-content p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+.opt-badge {
+  display: inline-block;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-top: 6px;
+}
+
+.opt-badge.coming-soon {
+  background: rgba(142,142,147,0.12);
+  color: var(--text-tertiary);
+}
+
+/* --- Options grille 2 colonnes --- */
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.options.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.options.grid-2 .option-card {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 12px;
+  gap: 8px;
+}
+
+.options.grid-2 .opt-radio { display: none; }
+
+.options.grid-2 .option-card .opt-icon {
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.options.grid-2 .option-card.selected {
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+/* --- Condition note --- */
+.condition-note {
+  background: rgba(255,149,0,0.08);
+  border: 1px solid rgba(255,149,0,0.2);
+  border-radius: var(--radius-xs);
+  padding: 10px 12px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--orange);
+  line-height: 1.35;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* ============================================
+   TOPBAR — Navigation commune (ADR-003)
+   ============================================ */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: rgba(26,26,30,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 1000;
+}
+
+.topbar-back {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.6);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.topbar-back:hover {
+  background: rgba(255,255,255,0.14);
+  color: white;
+}
+
+.topbar-back svg {
+  width: 8px; height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.topbar-breadcrumb {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.topbar-breadcrumb a,
+.topbar-breadcrumb span {
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.topbar-breadcrumb a {
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+}
+
+.topbar-breadcrumb a:hover {
+  color: var(--primary);
+}
+
+.topbar-breadcrumb .tb-active {
+  color: rgba(255,255,255,0.85);
+  font-weight: 600;
+}
+
+.topbar-breadcrumb .tb-sep {
+  color: rgba(255,255,255,0.2);
+  font-size: 11px;
+}
+
+.topbar-logo {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.topbar-logo:hover {
+  color: rgba(255,255,255,0.7);
+}
+
+/* Spacer pour compenser la topbar fixe */
+.topbar-spacer {
+  height: 56px;
+  flex-shrink: 0;
+}
+
+/* --- Utilitaires --- */
+.hidden { display: none !important; }

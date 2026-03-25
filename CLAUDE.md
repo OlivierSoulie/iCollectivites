@@ -9,13 +9,17 @@
 
 ## Description
 
-Configurateur en ligne pour la gamme de columbariums **Emeraude** de CIMTEA (fabricant/installateur pour communes et collectivites). L'outil permet aux elus et techniciens de composer leur columbarium etape par etape (disposition, modules, accessoires, caveau) et de demander un devis gratuit.
+Application iPad **iCollectivites** : outil d'aide a la vente pour CIMTEA (fabricant/installateur de columbariums pour communes et collectivites). Permet de configurer un columbarium, visualiser en 3D, prendre une photo du site, et generer un dossier devis complet.
 
-**Objectif** : Etre le premier configurateur columbarium en ligne du marche (aucun concurrent n'en propose).
+**5 ecrans** : Besoin > Produit > Configuration 3D > Infos + Devis PDF > Envoi email
 
 **Client** : CIMTEA — www.columbarium-cimtea.fr
+**Specs** : `INPUTS/20250109 - CIMTEA.pdf` (10 pages)
 
-**Stack technique** : HTML/CSS/JS vanilla (maquette), Three.js prevu pour la 3D. Fichiers CAO SolidWorks disponibles.
+**Stack technique** : HTML/CSS/JS vanilla (maquette actuelle), Three.js prevu pour la 3D. Fichiers CAO SolidWorks disponibles.
+
+**Scope** : Columbarium (prioritaire), Jardin du souvenir, Ossuaire
+**Differenciateur** : Aucun concurrent n'a de configurateur columbarium en ligne.
 
 ---
 
@@ -93,7 +97,8 @@ Suivre le workflow Scrumban :
 
 - **Sprint #0 (Cadrage)** : 11 SP livres, 3 US Done
 - **Velocity** : A calculer apres Sprint #1
-- **Backlog restant** : 4 US / 18 SP
+- **Backlog restant** : 10 US / 48 SP
+- **Total projet** : 13 US / 59 SP
 
 ---
 

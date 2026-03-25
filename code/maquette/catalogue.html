@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>CIMTEA — Catalogue</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(145deg, #2c2c30 0%, #1a1a1e 50%, #0d0d0f 100%);
+    }
+
+    /* --- Search bar --- */
+    .search-bar {
+      margin: 16px 40px 0;
+      position: relative;
+    }
+
+    .search-bar input {
+      width: 100%;
+      height: 44px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 0 16px 0 42px;
+      color: white;
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.15s;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .search-bar input::placeholder {
+      color: rgba(255,255,255,0.3);
+    }
+
+    .search-bar input:focus {
+      background: rgba(255,255,255,0.12);
+      border-color: var(--primary);
+    }
+
+    .search-bar .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,0.3);
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .search-bar .search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: rgba(255,255,255,0.5);
+      font-size: 14px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-bar .search-clear.visible { display: flex; }
+
+    /* --- Content area --- */
+    .catalogue-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 40px 40px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .catalogue-container::-webkit-scrollbar { display: none; }
+
+    /* --- Grille de cards --- */
+    .catalogue-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    /* --- Cards generiques --- */
+    .cat-card {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius);
+      padding: 24px 16px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cat-card:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    .cat-card:active { transform: scale(0.98); }
+
+    .cat-card .card-icon {
+      font-size: 40px;
+      line-height: 1;
+      margin-bottom: 4px;
+      color: white;
+    }
+
+    .cat-card.disabled .card-icon {
+      color: rgba(255,255,255,0.5);
+    }
+
+    .cat-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .cat-card .card-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.3;
+    }
+
+    .cat-card .card-info {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      background: rgba(0,122,255,0.15);
+      padding: 3px 10px;
+      border-radius: 6px;
+      margin-top: 4px;
+    }
+
+    .cat-card .card-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 6px;
+      margin-top: 4px;
+    }
+
+    .card-badge.available {
+      background: rgba(0,122,255,0.15);
+      color: var(--primary);
+    }
+
+    .card-badge.soon {
+      background: rgba(142,142,147,0.15);
+      color: rgba(255,255,255,0.35);
+    }
+
+    .cat-card.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .cat-card.disabled:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.1);
+      transform: none;
+    }
+
+    /* --- No results --- */
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(255,255,255,0.35);
+      font-size: 15px;
+    }
+
+    .no-results .nr-icon {
+      font-size: 48px;
+      opacity: 0.3;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar (ADR-003) -->
+  <nav class="topbar">
+    <button class="topbar-back" id="btnBack" onclick="goBack()" title="Retour">
+      <svg viewBox="0 0 8 14"><polyline points="7,1 1,7 7,13"/></svg>
+    </button>
+    <div class="topbar-breadcrumb" id="topbarBreadcrumb">
+      <a href="index.html">iCollectivites</a>
+      <span class="tb-sep">&#9656;</span>
+      <span class="tb-active" id="tbCurrent">Columbarium</span>
+    </div>
+    <a class="topbar-logo" href="index.html">CIMTEA</a>
+  </nav>
+  <div class="topbar-spacer"></div>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <span class="search-icon">&#128269;</span>
+    <input type="text" id="searchInput" placeholder="Rechercher une gamme ou un produit..." oninput="onSearch()">
+    <button class="search-clear" id="searchClear" onclick="clearSearch()">&#10005;</button>
+  </div>
+
+  <!-- Content -->
+  <div class="catalogue-container">
+
+    <!-- VUE 1 : Gammes -->
+    <div id="viewGammes">
+      <div class="catalogue-grid" id="gridGammes"></div>
+    </div>
+
+    <!-- VUE 2 : Produits d'une gamme -->
+    <div id="viewProduits" style="display:none">
+      <div class="catalogue-grid" id="gridProduits"></div>
+    </div>
+
+    <!-- Resultats recherche -->
+    <div id="viewSearch" style="display:none">
+      <div class="catalogue-grid" id="gridSearch"></div>
+      <div class="no-results" id="noResults" style="display:none">
+        <div class="nr-icon">&#128270;</div>
+        <p>Aucun resultat pour cette recherche.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ==================== DATA ====================
+
+    /** Read URL parameter by name */
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    /** All gammes with their products */
+    const GAMMES = [
+      {
+        id: 'emeraude',
+        nom: 'Emeraude',
+        icon: '&#9645;',
+        desc: 'Lignes contemporaines, colonnes elegantes',
+        info: '3 variantes',
+        active: true,
+        produits: [
+          { id: 'emeraude-rect', nom: 'Rectangulaire', icon: '&#9645;', desc: 'Implantation lineaire classique', info: '7 a 18 cases', active: true },
+          { id: 'emeraude-angle', nom: 'Angle (L)', icon: '&#8735;', desc: 'Implantation en equerre', info: '7 a 12 cases', active: true },
+          { id: 'emeraude-courbe', nom: 'Courbe', icon: '&#8978;', desc: 'Convexe ou concave', info: '12 a 18 cases', active: false }
+        ]
+      },
+      {
+        id: 'saphir',
+        nom: 'Saphir',
+        icon: '&#9670;',
+        desc: 'Pret a poser, montage 1h30',
+        info: '6, 12, 18 cases',
+        active: false,
+        produits: [
+          { id: 'saphir-6', nom: 'Saphir 6', icon: '&#9670;', desc: '96 x 65 x 135 cm', info: '6 cases &bull; 12 urnes', active: false },
+          { id: 'saphir-12', nom: 'Saphir 12', icon: '&#9670;', desc: '177 x 65 x 135 cm', info: '12 cases &bull; 24 urnes', active: false },
+          { id: 'saphir-18', nom: 'Saphir 18', icon: '&#9670;', desc: '231 x 65 x 135 cm', info: '18 cases &bull; 36 urnes', active: false }
+        ]
+      },
+      {
+        id: 'toscane', nom: 'Toscane', icon: '&#9641;', desc: '2-en-1', info: '', active: false, produits: []
+      },
+      {
+        id: 'azur', nom: 'Azur', icon: '&#9711;', desc: 'Design classique', info: '', active: false, produits: []
+      },
+      {
+        id: 'arche', nom: 'Arche', icon: '&#9516;', desc: 'Forme en arche', info: '', active: false, produits: []
+      },
+      {
+        id: 'floga', nom: 'Floga', icon: '&#9646;', desc: 'Double face', info: '', active: false, produits: []
+      },
+      {
+        id: 'platine', nom: 'Platine', icon: '&#9636;', desc: 'Haut de gamme', info: '', active: false, produits: []
+      },
+      {
+        id: 'pierre-de-lune', nom: 'Pierre de Lune', icon: '&#9675;', desc: 'Colonne', info: '', active: false, produits: []
+      },
+      {
+        id: 'fuji', nom: 'Fuji', icon: '&#9651;', desc: 'Pyramidal', info: '', active: false, produits: []
+      },
+      {
+        id: 'sfera', nom: 'Sfera', icon: '&#9673;', desc: 'Spherique', info: '', active: false, produits: []
+      },
+      {
+        id: 'rubis', nom: 'Rubis', icon: '&#9632;', desc: '', info: '', active: false, produits: []
+      },
+      {
+        id: 'hombourg', nom: 'Hombourg', icon: '&#9612;', desc: 'Colonne', info: '', active: false, produits: []
+      },
+      {
+        id: 'opale', nom: 'Opale', icon: '&#9638;', desc: 'Modulaire', info: '', active: false, produits: []
+      },
+      {
+        id: 'grenat', nom: 'Grenat', icon: '&#9830;', desc: '', info: '', active: false, produits: []
+      },
+      {
+        id: 'chatel', nom: 'Chatel', icon: '&#9644;', desc: '', info: '', active: false, produits: []
+      },
+      {
+        id: 'diamant', nom: 'Diamant', icon: '&#9672;', desc: '', info: '', active: false, produits: []
+      },
+      {
+        id: 'octo', nom: 'Octo', icon: '&#9677;', desc: 'Octogonal', info: '', active: false, produits: []
+      },
+      {
+        id: 'ombrie', nom: 'Ombrie', icon: '&#9643;', desc: '', info: '', active: false, produits: []
+      },
+      {
+        id: 'turquoise', nom: 'Turquoise', icon: '&#8978;', desc: 'Courbe', info: '', active: false, produits: []
+      },
+      {
+        id: 'venetie', nom: 'Venetie', icon: '&#9646;', desc: 'Double face', info: '', active: false, produits: []
+      }
+    ];
+
+    // ==================== STATE ====================
+
+    let currentView = 'gammes';
+    let currentGamme = null;
+
+    // ==================== RENDER ====================
+
+    /** Build a single card HTML */
+    function buildCard(item, onClick) {
+      const disabled = !item.active;
+      const cls = 'cat-card' + (disabled ? ' disabled' : '');
+      const badge = item.active
+        ? '<span class="card-badge available">Disponible</span>'
+        : '<span class="card-badge soon">Bientot disponible</span>';
+      const info = item.info ? `<span class="card-info">${item.info}</span>` : '';
+      const click = disabled ? '' : `onclick="${onClick}"`;
+
+      return `<div class="${cls}" ${click}>
+        <span class="card-icon">${item.icon}</span>
+        <h3>${item.nom}</h3>
+        ${item.desc ? `<p class="card-desc">${item.desc}</p>` : ''}
+        ${info}
+        ${badge}
+      </div>`;
+    }
+
+    /** Render gammes grid */
+    function renderGammes() {
+      const html = GAMMES.map(g =>
+        buildCard(g, `showGamme('${g.id}')`)
+      ).join('');
+      document.getElementById('gridGammes').innerHTML = html;
+    }
+
+    /** Render products for a specific gamme */
+    function renderProduits(gammeId) {
+      const gamme = GAMMES.find(g => g.id === gammeId);
+      if (!gamme || gamme.produits.length === 0) return;
+
+      const html = gamme.produits.map(p =>
+        buildCard(p, `selectProduct('${p.id}')`)
+      ).join('');
+      document.getElementById('gridProduits').innerHTML = html;
+    }
+
+    /** Render search results across gammes and products */
+    function renderSearch(query) {
+      const q = query.toLowerCase().trim();
+      const results = [];
+
+      GAMMES.forEach(g => {
+        if (matchesQuery(g, q)) {
+          results.push(buildCard(g, `showGamme('${g.id}')`));
+        }
+        g.produits.forEach(p => {
+          if (matchesQuery(p, q) || matchesQuery(g, q)) {
+            results.push(buildCard(
+              { ...p, nom: g.nom + ' ' + p.nom, icon: p.icon },
+              `selectProduct('${p.id}')`
+            ));
+          }
+        });
+      });
+
+      // Deduplicate by removing gamme cards if their products already appear
+      const grid = document.getElementById('gridSearch');
+      const noRes = document.getElementById('noResults');
+
+      if (results.length > 0) {
+        grid.innerHTML = results.join('');
+        grid.style.display = '';
+        noRes.style.display = 'none';
+      } else {
+        grid.style.display = 'none';
+        noRes.style.display = '';
+      }
+    }
+
+    /** Check if item matches search query */
+    function matchesQuery(item, query) {
+      const searchable = [item.id, item.nom, item.desc, item.info].join(' ').toLowerCase();
+      return searchable.includes(query);
+    }
+
+    // ==================== NAVIGATION ====================
+
+    /** Show the gamme detail (products within that gamme) */
+    function showGamme(gammeId) {
+      const gamme = GAMMES.find(g => g.id === gammeId);
+      if (!gamme) return;
+
+      if (gamme.produits.length === 0) {
+        // Gamme without sub-products: not yet available
+        return;
+      }
+
+      currentGamme = gamme;
+      currentView = 'produits';
+      renderProduits(gammeId);
+
+      document.getElementById('viewGammes').style.display = 'none';
+      document.getElementById('viewSearch').style.display = 'none';
+      document.getElementById('viewProduits').style.display = '';
+
+      updateTopbar(gamme.nom);
+
+      clearSearch();
+    }
+
+    /** Show gammes list */
+    function showGammesList() {
+      currentGamme = null;
+      currentView = 'gammes';
+
+      document.getElementById('viewGammes').style.display = '';
+      document.getElementById('viewProduits').style.display = 'none';
+      document.getElementById('viewSearch').style.display = 'none';
+
+      updateTopbar(null);
+    }
+
+    /** Save product to localStorage and go to configurator */
+    function selectProduct(productId) {
+      localStorage.setItem('icollectivites_produit', productId);
+      window.location.href = 'configurateur.html?produit=' + encodeURIComponent(productId);
+    }
+
+    /** Handle back button: produits -> gammes -> index */
+    function goBack() {
+      if (currentView === 'produits') {
+        showGammesList();
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+
+    // ==================== SEARCH ====================
+
+    /** Handle search input */
+    function onSearch() {
+      const input = document.getElementById('searchInput');
+      const query = input.value.trim();
+      const clearBtn = document.getElementById('searchClear');
+
+      clearBtn.classList.toggle('visible', query.length > 0);
+
+      if (query.length === 0) {
+        // Return to current view
+        document.getElementById('viewSearch').style.display = 'none';
+        if (currentView === 'produits' && currentGamme) {
+          document.getElementById('viewProduits').style.display = '';
+        } else {
+          document.getElementById('viewGammes').style.display = '';
+        }
+        return;
+      }
+
+      // Show search results
+      document.getElementById('viewGammes').style.display = 'none';
+      document.getElementById('viewProduits').style.display = 'none';
+      document.getElementById('viewSearch').style.display = '';
+
+      renderSearch(query);
+    }
+
+    /** Clear search input and return to previous view */
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      document.getElementById('searchClear').classList.remove('visible');
+      onSearch();
+    }
+
+    // ==================== TOPBAR ====================
+
+    /** Update topbar breadcrumb to reflect current navigation level */
+    function updateTopbar(gammeName) {
+      const besoin = getParam('besoin') || 'columbarium';
+      const besoinLabels = {
+        'columbarium': 'Columbarium',
+        'jardin': 'Jardin du souvenir',
+        'ossuaire': 'Ossuaire',
+        'global': 'Global'
+      };
+      const besoinLabel = besoinLabels[besoin] || 'Catalogue';
+      const bc = document.getElementById('topbarBreadcrumb');
+
+      if (gammeName) {
+        bc.innerHTML =
+          '<a href="index.html">iCollectivites</a>' +
+          '<span class="tb-sep">&#9656;</span>' +
+          '<a onclick="showGammesList()" style="cursor:pointer">' + besoinLabel + '</a>' +
+          '<span class="tb-sep">&#9656;</span>' +
+          '<span class="tb-active">' + gammeName + '</span>';
+      } else {
+        bc.innerHTML =
+          '<a href="index.html">iCollectivites</a>' +
+          '<span class="tb-sep">&#9656;</span>' +
+          '<span class="tb-active">' + besoinLabel + '</span>';
+      }
+    }
+
+    // ==================== INIT ====================
+
+    renderGammes();
+
+    // If gamme parameter is set, open that gamme directly
+    const initGamme = getParam('gamme');
+    if (initGamme) {
+      const gamme = GAMMES.find(g => g.id === initGamme);
+      if (gamme && gamme.produits.length > 0) {
+        currentGamme = gamme;
+        currentView = 'produits';
+        renderProduits(initGamme);
+        document.getElementById('viewGammes').style.display = 'none';
+        document.getElementById('viewSearch').style.display = 'none';
+        document.getElementById('viewProduits').style.display = '';
+        updateTopbar(gamme.nom);
+      } else {
+        showGammesList();
+      }
+    } else {
+      showGammesList();
+    }
+  </script>
+
+</body>
+</html>
