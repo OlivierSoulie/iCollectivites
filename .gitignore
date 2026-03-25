@@ -3,6 +3,11 @@
 # Windows Zone.Identifier (WSL2)
 *:Zone.Identifier
 
+# Fichiers CAO SolidWorks et inputs volumineux
+DOSSIER EMERAUDE RECTANGULAIRE/
+PROJET EMERAUDE IDEALO BANC - ANGLE/
+INPUTS/
+
 # Fichiers temporaires
 *.tmp
 *.log
