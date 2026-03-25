@@ -296,6 +296,7 @@
       <button class="vp-btn" title="Zoom +">+</button>
       <button class="vp-btn" title="Zoom -">&minus;</button>
       <button class="vp-btn" title="Recentrer">&#9678;</button>
+      <button class="vp-btn" title="Realite augmentee — bientot disponible" style="opacity:0.35;cursor:not-allowed" disabled>AR</button>
     </div>
 
   </div>
@@ -844,14 +845,35 @@
     }
 
     // ==================== INIT (ADR-002) ====================
-    /** Read product from URL, set disposition, start on step 2 */
+    /** Read product from URL, set disposition, restore config if returning from devis */
     function init() {
       const params = new URLSearchParams(window.location.search);
       const produit = params.get('produit') || 'emeraude-rect';
       const disposition = produit.includes('angle') ? 'angle' : 'rectangulaire';
 
-      // Set disposition silently (no UI for step 1)
       choices[1] = disposition;
+
+      // Restore choices from localStorage if available (returning from devis)
+      const saved = localStorage.getItem('icollectivites_config');
+      if (saved) {
+        try {
+          const config = JSON.parse(saved);
+          if (config.moduleDroit) { select(2, config.moduleDroit); }
+          if (config.moduleGauche) { select(3, config.moduleGauche); }
+          if (config.colonne) { select(4, config.colonne); }
+          if (config.bancDroit) { select(5, config.bancDroit); }
+          if (config.bancGauche) { select(6, config.bancGauche); }
+          if (config.recueillement) { select(7, config.recueillement); }
+          if (config.caveau) { select(8, config.caveau); }
+          // Return to recap if all steps were completed
+          if (config.caveau) {
+            buildRecap();
+            showStep(TOTAL);
+            return;
+          }
+        } catch (e) { /* ignore parse errors */ }
+      }
+
       showStep(2);
     }
 

@@ -241,7 +241,7 @@ Afin de garantir que seules les configurations valides sont proposees.
 
 #### [US-011] Ecran 4 — Saisie informations projet
 
-**Priorite** : Moyenne | **SP** : 5 | **Sprint** : #1 | **Status** : To Do | **Epic** : EPIC-05
+**Priorite** : Moyenne | **SP** : 5 | **Sprint** : #1 | **Status** : Done | **Epic** : EPIC-05
 
 En tant que commercial CIMTEA,
 Je veux saisir les informations du projet client et parametrer le devis,
@@ -314,7 +314,7 @@ Afin de transmettre l'offre au client sans quitter l'outil.
 | US-008 | Three.js rendu 3D temps reel | 8 | EPIC-04 | To Do |
 | US-009 | Photo sur site + placement AR | 8 | EPIC-04 | To Do |
 | US-010 | Logique metier et contraintes | 5 | EPIC-07 | To Do |
-| US-011 | Saisie informations projet | 5 | EPIC-05 | To Do (Sprint #1) |
+| US-011 | Saisie informations projet | 5 | EPIC-05 | Done |
 | US-012 | Generation dossier devis PDF | 8 | EPIC-05 | To Do |
 | US-013 | Envoi devis par email | 3 | EPIC-06 | To Do |
 

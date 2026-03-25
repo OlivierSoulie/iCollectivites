@@ -1,7 +1,7 @@
 # Kanban Board - CIMTEA iCollectivites
 
 **Projet** : 016-CIMTEA configurateur
-**Sprint** : Sprint #1 — Parcours complet (Ecrans 1 > 2 > 4)
+**Sprint** : Sprint #1 — TERMINE
 **Sprint Goal** : Completer le parcours utilisateur multi-ecrans avec navigation coherente
 **Derniere mise a jour** : 25/03/2026
 
@@ -9,9 +9,7 @@
 
 ## To Do
 
-| US | Titre | SP | Epic |
-|---|---|---|---|
-| US-011 | Ecran 4 — Saisie informations projet | 5 | EPIC-05 |
+(vide)
 
 ---
 
@@ -39,21 +37,34 @@
 |---|---|---|---|
 | US-004 | Ecran 1 — Selection besoin | 2 | 7/7 PASS |
 | US-005 | Ecran 2 — Selection produit | 3 | 29/29 PASS + re-test 17/17 PASS |
+| US-011 | Ecran 4 — Saisie infos projet + devis | 5 | 17/17 PASS |
 
-**SP livres Sprint #1** : 5/10 SP (50%)
+**SP livres Sprint #1** : 10/10 SP (100%)
 
 ---
 
 ## ADRs crees ce sprint
 
 - **ADR-001** : Structure multi-pages HTML avec CSS partage
-- **ADR-002** : Disposition pre-selectionnee depuis le catalogue
+- **ADR-002** : Disposition geree par le catalogue, pas le configurateur
 - **ADR-003** : Topbar de navigation commune a tous les ecrans
 - **ADR-004** : Barre d'etapes de configuration sous la topbar
 
 ---
 
-## Backlog (hors Sprint #1)
+## Sprint #1 — Livrables
+
+**Fichiers crees/modifies** :
+- `code/maquette/index.html` — Ecran 1 : selection besoin (4 cards)
+- `code/maquette/catalogue.html` — Ecran 2 : catalogue 20 gammes, 2 niveaux, recherche
+- `code/maquette/configurateur.html` — Ecran 3 : refactorise (topbar, stepbar, disposition auto, restauration config)
+- `code/maquette/devis.html` — Ecran 4 : formulaire devis + photo AR placeholder
+- `code/maquette/styles.css` — CSS commun (topbar, composants)
+- `docs/decisions/ADR-001 a 004`
+
+---
+
+## Backlog (Sprint #2 a planifier)
 
 | US | Titre | SP | Epic |
 |---|---|---|---|
@@ -69,8 +80,6 @@
 
 ## Sprint #0 — Cadrage (24/03/2026) — TERMINE
 
-**Sprint Goal** : Recherche metier, conception du parcours utilisateur, maquette UI fonctionnelle.
-
 | US | Titre | SP |
 |---|---|---|
 | US-001 | Synthese de recherche CIMTEA et benchmark | 3 |
@@ -83,8 +92,8 @@
 
 ## Statistiques
 
-**Sprints completes** : 1 (Sprint #0)
-**Sprint #1 en cours** : 5/10 SP livres (US-004 + US-005 Done, US-011 To Do)
-**Story Points livres total** : 16 SP
-**User Stories completees total** : 5
+**Sprints completes** : 2 (Sprint #0 + Sprint #1)
+**Story Points livres total** : 21 SP
+**User Stories completees total** : 6
 **Backlog restant** : 7 US / 38 SP
+**Velocity** : Sprint #0 = 11 SP, Sprint #1 = 10 SP (moyenne 10.5 SP)

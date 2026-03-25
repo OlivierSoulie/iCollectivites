@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>CIMTEA — Devis</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: row;
+      background: #1a1a1e;
+      padding-top: 56px;
+    }
+
+    /* --- Layout 2 colonnes : photo gauche, formulaire droite --- */
+    .photo-panel {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #2c2c30 0%, #1a1a1e 50%, #0d0d0f 100%);
+      overflow: hidden;
+    }
+
+    .photo-placeholder {
+      text-align: center;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .photo-placeholder .ph-icon {
+      font-size: 80px;
+      opacity: 0.25;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .photo-placeholder .ph-text {
+      font-size: 17px;
+      font-weight: 500;
+      opacity: 0.5;
+    }
+
+    .photo-placeholder .ph-hint {
+      font-size: 13px;
+      opacity: 0.3;
+      margin-top: 8px;
+    }
+
+    .photo-toolbar {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .photo-toolbar .vp-btn {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.7);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: not-allowed;
+      opacity: 0.35;
+    }
+
+    /* --- Sidebar formulaire (droite) --- */
+    .devis-sidebar {
+      width: var(--sidebar-width);
+      height: calc(100vh - 56px); height: calc(100dvh - 56px);
+      background: var(--glass-strong);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border-left: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .devis-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 20px 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .devis-scroll::-webkit-scrollbar { display: none; }
+
+    /* --- Recap config (lecture seule) --- */
+    .config-recap {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .config-recap h3 {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .config-recap .recap-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+
+    .config-recap .recap-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+    }
+
+    .config-recap .recap-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .config-recap .recap-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* --- Section titre --- */
+    .section-heading {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .section-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    /* --- Formulaire --- */
+    .form-card {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .form-card h4 {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child { margin-bottom: 0; }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-group label .required {
+      color: #ff453a;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 44px;
+      background: white;
+      border: 1px solid var(--separator);
+      border-radius: 10px;
+      padding: 0 14px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.15s;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .form-input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .form-input.invalid {
+      border-color: #ff453a;
+    }
+
+    /* --- Remise input avec % --- */
+    .input-with-suffix {
+      position: relative;
+    }
+
+    .input-with-suffix .form-input {
+      padding-right: 40px;
+    }
+
+    .input-with-suffix .suffix {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      font-size: 15px;
+      font-weight: 600;
+      pointer-events: none;
+    }
+
+    /* --- Radio group (forfait pose) --- */
+    .radio-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .radio-option {
+      flex: 1;
+      background: white;
+      border: 2px solid var(--separator);
+      border-radius: 10px;
+      padding: 14px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .radio-option:hover {
+      background: var(--bg);
+    }
+
+    .radio-option.selected {
+      background: rgba(0,122,255,0.15);
+      border-color: var(--primary);
+    }
+
+    .radio-option h5 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .radio-option p {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .radio-option.selected h5 { color: var(--primary); }
+    .radio-option.selected p { color: rgba(0,122,255,0.7); }
+
+    /* --- Footer dans la sidebar --- */
+    .devis-footer-bar {
+      padding: 12px 20px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--separator);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* --- Toast notification --- */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 12px 20px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 2000;
+    }
+
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar (ADR-003) -->
+  <nav class="topbar">
+    <button class="topbar-back" onclick="goBack()" title="Retour">
+      <svg viewBox="0 0 8 14"><polyline points="7,1 1,7 7,13"/></svg>
+    </button>
+    <div class="topbar-breadcrumb" id="topbarBreadcrumb">
+      <a href="index.html">iCollectivites</a>
+      <span class="tb-sep">&#9656;</span>
+      <a href="catalogue.html?besoin=columbarium">Columbarium</a>
+      <span class="tb-sep">&#9656;</span>
+      <span class="tb-active" id="tbProduit">Devis</span>
+    </div>
+    <a class="topbar-logo" href="index.html">CIMTEA</a>
+  </nav>
+
+  <!-- Panneau photo AR (gauche) — bouchonne -->
+  <div class="photo-panel">
+    <div class="photo-placeholder">
+      <div class="ph-icon">&#128247;</div>
+      <div class="ph-text">Photo du site</div>
+      <div class="ph-hint">Placement AR du columbarium — bientot disponible</div>
+    </div>
+    <div class="photo-toolbar">
+      <button class="vp-btn" title="Prendre une photo — bientot disponible" disabled>&#128247;</button>
+      <button class="vp-btn" title="Galerie — bientot disponible" disabled>AR</button>
+    </div>
+  </div>
+
+  <!-- Sidebar formulaire (droite) -->
+  <div class="devis-sidebar">
+  <div class="devis-scroll">
+
+    <!-- Recap config (T2) -->
+    <div class="config-recap" id="configRecap">
+      <h3>Configuration selectionnee</h3>
+      <div class="recap-grid" id="recapGrid"></div>
+    </div>
+
+    <!-- Formulaire (T3) -->
+    <h2 class="section-heading">Informations projet</h2>
+    <p class="section-sub">Completez les informations pour generer votre devis.</p>
+
+    <div class="form-card">
+      <h4>Projet</h4>
+
+      <div class="form-group">
+        <label>Commune <span class="required">*</span></label>
+        <input type="text" class="form-input" id="inputCommune" placeholder="Nom de la commune" oninput="onCommuneChange()">
+      </div>
+
+      <div class="form-group">
+        <label>Nom du projet</label>
+        <input type="text" class="form-input" id="inputNomProjet" placeholder="CIMTEA-2026-...">
+      </div>
+
+      <div class="form-group">
+        <label>Reference</label>
+        <input type="text" class="form-input" id="inputReference" placeholder="Reference interne (optionnel)">
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h4>Conditions commerciales</h4>
+
+      <div class="form-group">
+        <label>Taux de remise</label>
+        <div class="input-with-suffix">
+          <input type="number" class="form-input" id="inputRemise" value="0" min="0" max="100" step="0.5" oninput="clampRemise(this)">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Forfait de pose</label>
+        <div class="radio-group">
+          <div class="radio-option selected" onclick="selectForfait('facile')" id="forfait-facile">
+            <h5>Facile</h5>
+            <p>Terrain accessible</p>
+          </div>
+          <div class="radio-option" onclick="selectForfait('normal')" id="forfait-normal">
+            <h5>Normal</h5>
+            <p>Terrain standard</p>
+          </div>
+          <div class="radio-option" onclick="selectForfait('difficile')" id="forfait-difficile">
+            <h5>Difficile</h5>
+            <p>Acces complexe</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /devis-scroll -->
+
+    <!-- Footer dans la sidebar -->
+    <div class="devis-footer-bar">
+      <button class="btn btn-secondary" onclick="goBack()" title="Retour">
+        <svg viewBox="0 0 12 18"><polyline points="10,2 2,9 10,16"/></svg>
+      </button>
+      <button class="btn btn-primary" id="btnGenerate" onclick="generateDevis()">
+        Generer le devis
+      </button>
+    </div>
+
+  </div><!-- /devis-sidebar -->
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ==================== CONFIG FROM LOCALSTORAGE (T2) ====================
+
+    /** Load configuration from localStorage */
+    function loadConfig() {
+      const raw = localStorage.getItem('icollectivites_config');
+      if (!raw) {
+        window.location.href = 'index.html';
+        return null;
+      }
+      try {
+        return JSON.parse(raw);
+      } catch (e) {
+        window.location.href = 'index.html';
+        return null;
+      }
+    }
+
+    /** Render the config recap at top of page */
+    function renderRecap(config) {
+      if (!config) return;
+
+      const labels = config.labels || {};
+      const l = function(v) { return labels[v] || v || '—'; };
+      const grid = document.getElementById('recapGrid');
+      const items = [];
+
+      items.push({ label: 'Disposition', value: l(config.disposition) });
+      items.push({ label: 'Module droit', value: l(config.moduleDroit) });
+
+      if (config.moduleGauche && config.moduleGauche !== 'aucun') {
+        items.push({ label: 'Module gauche', value: l(config.moduleGauche) });
+      }
+
+      if (config.colonne && config.colonne !== 'non') {
+        items.push({ label: 'Colonne', value: l(config.colonne) });
+      }
+
+      if (config.bancDroit && config.bancDroit !== 'aucun') {
+        items.push({ label: 'Banc droit', value: l(config.bancDroit) });
+      }
+
+      if (config.bancGauche && config.bancGauche !== 'aucun') {
+        items.push({ label: 'Banc gauche', value: l(config.bancGauche) });
+      }
+
+      if (config.recueillement && config.recueillement !== 'aucun') {
+        items.push({ label: 'Recueillement', value: l(config.recueillement) });
+      }
+
+      if (config.caveau && config.caveau !== 'aucun') {
+        items.push({ label: 'Caveau', value: l(config.caveau) });
+      }
+
+      grid.innerHTML = items.map(function(item) {
+        return '<div class="recap-item">' +
+          '<span class="recap-label">' + item.label + '</span>' +
+          '<span class="recap-value">' + item.value + '</span>' +
+          '</div>';
+      }).join('');
+    }
+
+    /** Update topbar breadcrumb with product name */
+    function updateTopbar(config) {
+      if (!config) return;
+      const produit = config.produit || '';
+      const produitLabel = produit.includes('angle') ? 'Emeraude Angle' : 'Emeraude Rect.';
+      const bc = document.getElementById('topbarBreadcrumb');
+
+      bc.innerHTML =
+        '<a href="index.html">iCollectivites</a>' +
+        '<span class="tb-sep">&#9656;</span>' +
+        '<a href="catalogue.html?besoin=columbarium">Columbarium</a>' +
+        '<span class="tb-sep">&#9656;</span>' +
+        '<a href="configurateur.html?produit=' + encodeURIComponent(produit) + '">' + produitLabel + '</a>' +
+        '<span class="tb-sep">&#9656;</span>' +
+        '<span class="tb-active">Devis</span>';
+    }
+
+    // ==================== PROJECT NAME GENERATION (T3) ====================
+
+    /** Generate a default project name from date and commune */
+    function generateProjectName(commune) {
+      const now = new Date();
+      const date = now.getFullYear() + '-' +
+        String(now.getMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getDate()).padStart(2, '0');
+      const communeSlug = (commune || 'commune').toUpperCase().replace(/\s+/g, '-');
+      return 'CIMTEA-' + date + '-' + communeSlug;
+    }
+
+    /** Update project name when commune changes */
+    function onCommuneChange() {
+      const commune = document.getElementById('inputCommune').value.trim();
+      const nomInput = document.getElementById('inputNomProjet');
+      // Only auto-update if user hasn't manually edited the name
+      if (!nomInput.dataset.edited) {
+        nomInput.value = generateProjectName(commune);
+      }
+    }
+
+    // ==================== FORFAIT SELECTION (T3) ====================
+
+    /** Clamp remise value between 0 and 100 */
+    function clampRemise(input) {
+      const val = parseFloat(input.value);
+      if (val > 100) input.value = 100;
+      if (val < 0) input.value = 0;
+    }
+
+    let selectedForfait = 'facile';
+
+    /** Select a forfait de pose option */
+    function selectForfait(type) {
+      document.querySelectorAll('.radio-option').forEach(function(el) {
+        el.classList.remove('selected');
+      });
+      document.getElementById('forfait-' + type).classList.add('selected');
+      selectedForfait = type;
+    }
+
+    // ==================== GENERATE DEVIS (T4 — bouchonne) ====================
+
+    /** Show a toast notification */
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('visible');
+      setTimeout(function() {
+        toast.classList.remove('visible');
+      }, 3000);
+    }
+
+    /** Generate devis — bouchonne pour Sprint #1 */
+    function generateDevis() {
+      const commune = document.getElementById('inputCommune').value.trim();
+      if (!commune) {
+        document.getElementById('inputCommune').classList.add('invalid');
+        document.getElementById('inputCommune').focus();
+        showToast('Veuillez renseigner la commune');
+        return;
+      }
+
+      showToast('Generation du devis — bientot disponible');
+    }
+
+    // ==================== NAVIGATION (T4) ====================
+
+    /** Go back to configurator */
+    function goBack() {
+      const config = loadConfig();
+      if (config && config.produit) {
+        window.location.href = 'configurateur.html?produit=' + encodeURIComponent(config.produit);
+      } else {
+        window.location.href = 'index.html';
+      }
+    }
+
+    // ==================== INIT ====================
+
+    const config = loadConfig();
+    renderRecap(config);
+    updateTopbar(config);
+
+    // Set default project name
+    document.getElementById('inputNomProjet').value = generateProjectName('');
+
+    // Mark name as manually edited if user types in it
+    document.getElementById('inputNomProjet').addEventListener('input', function() {
+      this.dataset.edited = 'true';
+    });
+
+    // Remove invalid state on commune input
+    document.getElementById('inputCommune').addEventListener('input', function() {
+      this.classList.remove('invalid');
+    });
+  </script>
+
+</body>
+</html>

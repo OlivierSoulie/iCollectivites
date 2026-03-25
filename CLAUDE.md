@@ -96,9 +96,10 @@ Suivre le workflow Scrumban :
 ## Metriques
 
 - **Sprint #0 (Cadrage)** : 11 SP livres, 3 US Done
-- **Velocity** : A calculer apres Sprint #1
-- **Backlog restant** : 10 US / 48 SP
-- **Total projet** : 13 US / 59 SP
+- **Sprint #1 (Parcours)** : 10 SP livres, 3 US Done
+- **Velocity** : 10.5 SP/sprint
+- **Backlog restant** : 7 US / 38 SP
+- **Total projet** : 13 US / 59 SP (6 Done, 7 To Do)
 
 ---
 
