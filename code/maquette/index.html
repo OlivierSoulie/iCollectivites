@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>CIMTEA — iCollectivites</title>
+  <title>CIMTEA — iCollectivités</title>
   <link rel="stylesheet" href="styles.css">
   <style>
     body {
@@ -156,7 +156,7 @@
   <nav class="topbar">
     <div style="width:36px"></div>
     <div class="topbar-breadcrumb">
-      <span class="tb-active">iCollectivites</span>
+      <span class="tb-active">iCollectivités</span>
     </div>
     <a class="topbar-logo" href="index.html">CIMTEA</a>
   </nav>
@@ -165,7 +165,7 @@
   <!-- Header -->
   <div class="app-header">
     <h1>Quel est votre besoin ?</h1>
-    <p class="subtitle">Configurez et chiffrez vos amenagements funeraires.</p>
+    <p class="subtitle">Configurez et chiffrez vos aménagements funéraires.</p>
   </div>
 
   <!-- Cards de selection du besoin -->
@@ -175,7 +175,7 @@
       <div class="need-card" onclick="selectBesoin('columbarium')">
         <span class="card-icon">&#9965;</span>
         <h2>Columbarium</h2>
-        <p>Gamme Emeraude, Saphir et plus</p>
+        <p>Gamme Émeraude, Saphir et plus</p>
         <span class="card-badge active">Disponible</span>
       </div>
 
@@ -183,21 +183,21 @@
         <span class="card-icon">&#127793;</span>
         <h2>Jardin du souvenir</h2>
         <p>Collection Absolu</p>
-        <span class="card-badge soon">Bientot disponible</span>
+        <span class="card-badge soon">Bientôt disponible</span>
       </div>
 
       <div class="need-card disabled">
         <span class="card-icon">&#9670;</span>
         <h2>Ossuaire</h2>
         <p>Solutions sur mesure</p>
-        <span class="card-badge soon">Bientot disponible</span>
+        <span class="card-badge soon">Bientôt disponible</span>
       </div>
 
       <div class="need-card disabled">
         <span class="card-icon">&#9881;</span>
         <h2>Global</h2>
         <p>Projet complet multi-produits</p>
-        <span class="card-badge soon">Bientot disponible</span>
+        <span class="card-badge soon">Bientôt disponible</span>
       </div>
 
     </div>
@@ -205,15 +205,27 @@
 
   <!-- Footer -->
   <div class="app-footer">
-    CIMTEA &mdash; Createur de columbariums depuis 1995
+    CIMTEA &mdash; Créateur de columbariums depuis 1995
   </div>
 
   <script>
+    /** Clear all saved configuration data */
+    function clearConfig() {
+      localStorage.removeItem('icollectivites_config');
+      localStorage.removeItem('icollectivites_devis');
+      localStorage.removeItem('icollectivites_besoin');
+      localStorage.removeItem('icollectivites_produit');
+    }
+
     /** Navigate to catalogue page with selected need type */
     function selectBesoin(type) {
+      clearConfig();
       localStorage.setItem('icollectivites_besoin', type);
       window.location.href = 'catalogue.html?besoin=' + encodeURIComponent(type);
     }
+
+    // Clear config on page load (retour accueil = RAZ)
+    clearConfig();
   </script>
 
 </body>

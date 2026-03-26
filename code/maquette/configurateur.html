@@ -14,7 +14,7 @@
     }
 
     /* ============================================
-       BARRE D'ETAPES — Resume config (ADR-004)
+       BARRE D'ETAPES — Résumé config (ADR-004)
        ============================================ */
     .stepbar {
       position: fixed;
@@ -271,7 +271,7 @@
       <span class="tb-sep">&#9656;</span>
       <a href="catalogue.html?besoin=columbarium">Columbarium</a>
       <span class="tb-sep">&#9656;</span>
-      <span class="tb-active" id="tbProduit">Emeraude Rect.</span>
+      <span class="tb-active" id="tbProduit">Émeraude Rect.</span>
     </div>
     <a class="topbar-logo" href="index.html">CIMTEA</a>
   </nav>
@@ -287,7 +287,7 @@
     <div class="viewport-content" id="viewportContent">
       <div class="placeholder-icon">&#9965;</div>
       <div class="placeholder-text">Visualisation 3D</div>
-      <div class="placeholder-hint">Le rendu se mettra a jour a chaque selection</div>
+      <div class="placeholder-hint">Le rendu se mettra à jour à chaque sélection</div>
     </div>
 
     <!-- Viewport tools -->
@@ -296,7 +296,7 @@
       <button class="vp-btn" title="Zoom +">+</button>
       <button class="vp-btn" title="Zoom -">&minus;</button>
       <button class="vp-btn" title="Recentrer">&#9678;</button>
-      <button class="vp-btn" title="Realite augmentee — bientot disponible" style="opacity:0.35;cursor:not-allowed" disabled>AR</button>
+      <button class="vp-btn" title="Réalité augmentée — bientôt disponible" style="opacity:0.35;cursor:not-allowed" disabled>AR</button>
     </div>
 
   </div>
@@ -339,13 +339,15 @@
             </div>
           </div>
         </div>
+        <div class="granit-picker" id="granit-picker-2"></div>
+        <div class="granit-picker" id="portes-picker-2"></div>
       </div>
 
       <!-- ===== ETAPE 3 : Module gauche ===== -->
       <div class="step" id="step-3">
         <div class="sidebar-header">
           <h2>Module gauche</h2>
-          <p>Ajoutez un second module symetrique.</p>
+          <p>Ajoutez un second module symétrique.</p>
         </div>
         <div style="height:16px"></div>
         <div class="options">
@@ -378,13 +380,15 @@
             </div>
           </div>
         </div>
+        <div class="granit-picker" id="granit-picker-3"></div>
+        <div class="granit-picker" id="portes-picker-3"></div>
       </div>
 
       <!-- ===== ETAPE 4 : Colonne ===== -->
       <div class="step" id="step-4">
         <div class="sidebar-header">
-          <h2>Colonne decorative</h2>
-          <p>Colonne en granit sur le cote droit du module.</p>
+          <h2>Colonne décorative</h2>
+          <p>Colonne en granit sur le côté droit du module.</p>
         </div>
         <div style="height:16px"></div>
         <div class="options grid-2">
@@ -392,7 +396,7 @@
             <span class="opt-icon">&#9612;</span>
             <div class="opt-content">
               <h3>Avec</h3>
-              <p>Colonne laterale</p>
+              <p>Colonne latérale</p>
             </div>
           </div>
           <div class="option-card" onclick="select(4,'non')" id="opt-4-non">
@@ -407,13 +411,14 @@
           <span>&#9888;</span>
           <span>Option disponible uniquement en rectangulaire, 7 cases, sans module gauche.</span>
         </div>
+        <div class="granit-picker" id="granit-picker-4"></div>
       </div>
 
       <!-- ===== ETAPE 5 : Banc droit ===== -->
       <div class="step" id="step-5">
         <div class="sidebar-header">
           <h2>Banc droit</h2>
-          <p>Banc place du cote droit.</p>
+          <p>Banc placé du côté droit.</p>
         </div>
         <div style="height:16px"></div>
         <div class="options">
@@ -421,7 +426,7 @@
             <span class="opt-radio"></span>
             <div class="opt-content">
               <h3>Aucun</h3>
-              <p>Pas de banc a droite</p>
+              <p>Pas de banc à droite</p>
             </div>
           </div>
           <div class="option-card" onclick="select(5,'berlin')" id="opt-5-berlin">
@@ -439,13 +444,14 @@
             </div>
           </div>
         </div>
+        <div class="granit-picker" id="granit-picker-5"></div>
       </div>
 
       <!-- ===== ETAPE 6 : Banc gauche ===== -->
       <div class="step" id="step-6">
         <div class="sidebar-header">
           <h2>Banc gauche</h2>
-          <p>Banc place du cote gauche.</p>
+          <p>Banc placé du côté gauche.</p>
         </div>
         <div style="height:16px"></div>
         <div class="options">
@@ -453,7 +459,7 @@
             <span class="opt-radio"></span>
             <div class="opt-content">
               <h3>Aucun</h3>
-              <p>Pas de banc a gauche</p>
+              <p>Pas de banc à gauche</p>
             </div>
           </div>
           <div class="option-card" onclick="select(6,'berlin')" id="opt-6-berlin">
@@ -471,6 +477,7 @@
             </div>
           </div>
         </div>
+        <div class="granit-picker" id="granit-picker-6"></div>
       </div>
 
       <!-- ===== ETAPE 7 : Espace de recueillement ===== -->
@@ -492,17 +499,18 @@
             <span class="opt-icon">&#9965;</span>
             <div class="opt-content">
               <h3>IDEALO 2023</h3>
-              <p>Monument decoratif</p>
+              <p>Monument décoratif</p>
             </div>
           </div>
         </div>
+        <div class="granit-picker" id="granit-picker-7"></div>
       </div>
 
       <!-- ===== ETAPE 8 : Caveau ===== -->
       <div class="step" id="step-8">
         <div class="sidebar-header">
-          <h2>Caveau enterre</h2>
-          <p>Caveau polymere sous le columbarium.</p>
+          <h2>Caveau enterré</h2>
+          <p>Caveau polymère sous le columbarium.</p>
         </div>
         <div style="height:16px"></div>
         <div class="options">
@@ -517,14 +525,14 @@
             <span class="opt-radio"></span>
             <div class="opt-content">
               <h3>Simple 27 cm avec fond</h3>
-              <p>Caveau polymere ferme</p>
+              <p>Caveau polymère fermé</p>
             </div>
           </div>
           <div class="option-card" onclick="select(8,'simple-sans')" id="opt-8-simple-sans">
             <span class="opt-radio"></span>
             <div class="opt-content">
               <h3>Simple 27 cm sans fond</h3>
-              <p>Caveau polymere ouvert</p>
+              <p>Caveau polymère ouvert</p>
             </div>
           </div>
           <div class="option-card" onclick="select(8,'double')" id="opt-8-double">
@@ -537,76 +545,11 @@
         </div>
       </div>
 
-      <!-- ===== ETAPE 10 : Granit du corps (US-006) ===== -->
-      <div class="step" id="step-10">
-        <div class="sidebar-header">
-          <h2>Granit du corps</h2>
-          <p>Coloris du granit pour le corps du columbarium.</p>
-        </div>
-        <div style="height:16px"></div>
-        <div class="options grid-3">
-          <div class="option-card" onclick="select(10,'rose-porrino')" id="opt-10-rose-porrino">
-            <span class="color-swatch" style="background:#c4867a"></span>
-            <div class="opt-content">
-              <h3>Rose Porrino</h3>
-            </div>
-          </div>
-          <div class="option-card" onclick="select(10,'balmoral')" id="opt-10-balmoral">
-            <span class="color-swatch" style="background:#8b6f5e"></span>
-            <div class="opt-content">
-              <h3>Balmoral</h3>
-            </div>
-          </div>
-          <div class="option-card" onclick="select(10,'bianco-carrara')" id="opt-10-bianco-carrara">
-            <span class="color-swatch" style="background:#e8e4df"></span>
-            <div class="opt-content">
-              <h3>Bianco Carrara</h3>
-            </div>
-          </div>
-          <div class="option-card" onclick="select(10,'crema-julia')" id="opt-10-crema-julia">
-            <span class="color-swatch" style="background:#d4c4a8"></span>
-            <div class="opt-content">
-              <h3>Crema Julia</h3>
-            </div>
-          </div>
-          <div class="option-card" onclick="select(10,'kriscon-chocolat')" id="opt-10-kriscon-chocolat">
-            <span class="color-swatch" style="background:#4a3728"></span>
-            <div class="opt-content">
-              <h3>Kriscon Chocolat</h3>
-            </div>
-          </div>
-          <div class="option-card" onclick="select(10,'labrador-vert')" id="opt-10-labrador-vert">
-            <span class="color-swatch" style="background:#2d4a3e"></span>
-            <div class="opt-content">
-              <h3>Labrador Vert</h3>
-            </div>
-          </div>
-          <div class="option-card" onclick="select(10,'noir-absolu-extra')" id="opt-10-noir-absolu-extra">
-            <span class="color-swatch" style="background:#1a1a1a"></span>
-            <div class="opt-content">
-              <h3>Noir Absolu Extra</h3>
-            </div>
-          </div>
-          <div class="option-card" onclick="select(10,'tarn-gris')" id="opt-10-tarn-gris">
-            <span class="color-swatch" style="background:#7a7a7a"></span>
-            <div class="opt-content">
-              <h3>Tarn Gris</h3>
-            </div>
-          </div>
-          <div class="option-card" onclick="select(10,'tarn-marron')" id="opt-10-tarn-marron">
-            <span class="color-swatch" style="background:#6b4e3d"></span>
-            <div class="opt-content">
-              <h3>Tarn Marron</h3>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ===== ETAPE 12 : Recapitulatif (renumerote depuis step-9) ===== -->
+      <!-- ===== ETAPE 12 : Recapitulatif ===== -->
       <div class="step" id="step-12">
         <div class="sidebar-header">
-          <h2>Recapitulatif</h2>
-          <p id="recap-subtitle">Votre configuration Emeraude.</p>
+          <h2>Récapitulatif</h2>
+          <p id="recap-subtitle">Votre configuration Émeraude.</p>
         </div>
         <div style="height:16px"></div>
 
@@ -652,10 +595,8 @@
 
         <div class="recap-section">
           <h4>Finitions</h4>
-          <div class="recap-row">
-            <span class="label">Granit corps</span>
-            <span class="value" id="recap-granit">—</span>
-          </div>
+          <div id="recap-granits"></div>
+          <div id="recap-portes-list"></div>
         </div>
       </div>
 
@@ -679,11 +620,12 @@
     let currentStep = 0;
     const TOTAL = 12;
     const choices = {};
+    const granitChoices = {};
 
     const stepNames = [
       '','','Module droit','Module gauche',
       'Colonne','Banc droit','Banc gauche','Recueillement','Caveau',
-      '','Granit du corps','','Recapitulatif'
+      '','','Matière des portes','Récapitulatif'
     ];
 
     const labels = {
@@ -695,14 +637,44 @@
       'simple-fond':'Simple 27cm (fond)','simple-sans':'Simple 27cm (ouvert)','double':'Double 54cm',
       'rose-porrino':'Rose Porrino','balmoral':'Balmoral','bianco-carrara':'Bianco Carrara',
       'crema-julia':'Crema Julia','kriscon-chocolat':'Kriscon Chocolat','labrador-vert':'Labrador Vert',
-      'noir-absolu-extra':'Noir Absolu Extra','tarn-gris':'Tarn Gris','tarn-marron':'Tarn Marron'
+      'noir-absolu-extra':'Noir Absolu Extra','tarn-gris':'Tarn Gris','tarn-marron':'Tarn Marron',
+      'noir-absolu':'Noir Absolu','noir-afrique':'Noir Afrique','bleu-lanhelin':'Bleu Lanhelin',
+      'gris-tarn':'Gris Tarn','lanhelin':'Lanhelin'
     };
+
+    // Granit data for inline pickers
+    const GRANITS = [
+      { id: 'rose-porrino', nom: 'Rose Porrino', color: '#c4867a' },
+      { id: 'balmoral', nom: 'Balmoral', color: '#8b6f5e' },
+      { id: 'bianco-carrara', nom: 'Bianco Carrara', color: '#e8e4df' },
+      { id: 'crema-julia', nom: 'Crema Julia', color: '#d4c4a8' },
+      { id: 'kriscon-chocolat', nom: 'Kriscon Chocolat', color: '#4a3728' },
+      { id: 'labrador-vert', nom: 'Labrador Vert', color: '#2d4a3e' },
+      { id: 'noir-absolu-extra', nom: 'Noir Absolu Extra', color: '#1a1a1a' },
+      { id: 'tarn-gris', nom: 'Tarn Gris', color: '#7a7a7a' },
+      { id: 'tarn-marron', nom: 'Tarn Marron', color: '#6b4e3d' }
+    ];
+
+    // Steps that have a granit picker
+    const STEPS_WITH_GRANIT = [2, 3, 4, 5, 6, 7];
+
+    // Portes data for inline pickers (modules only)
+    const PORTES = [
+      { id: 'noir-absolu', nom: 'Noir Absolu', color: '#1a1a1a' },
+      { id: 'noir-afrique', nom: 'Noir Afrique', color: '#2c2c2c' },
+      { id: 'bleu-lanhelin', nom: 'Bleu Lanhelin', color: '#3d5a6e' },
+      { id: 'gris-tarn', nom: 'Gris Tarn', color: '#8a8a8a' },
+      { id: 'lanhelin', nom: 'Lanhelin', color: '#6b7b8a' }
+    ];
+
+    const portesChoices = {};
+    const STEPS_WITH_PORTES = [2, 3];
 
     // ==================== TOPBAR (ADR-003) ====================
     /** Update the topbar breadcrumb — stays short and fixed */
     function updateTopbarStep() {
       const produit = new URLSearchParams(window.location.search).get('produit') || '';
-      const produitLabel = produit.includes('angle') ? 'Emeraude Angle' : 'Emeraude Rect.';
+      const produitLabel = produit.includes('angle') ? 'Émeraude Angle' : 'Émeraude Rect.';
       const bc = document.getElementById('topbarBreadcrumb');
 
       bc.innerHTML =
@@ -724,8 +696,7 @@
       6: 'Banc G',
       7: 'Recueil.',
       8: 'Caveau',
-      10: 'Granit',
-      12: 'Recap'
+      12: 'Récap'
     };
 
     /** Get display value for a completed step */
@@ -783,7 +754,7 @@
       if (showColonne()) steps.push(4);
       steps.push(5);
       if (choices[3] && choices[3] !== 'aucun') steps.push(6);
-      steps.push(7, 8, 10, 12);
+      steps.push(7, 8, 12);
       return steps;
     }
 
@@ -796,6 +767,74 @@
       updateButton();
     }
 
+    // ==================== GRANIT PICKERS (inline per element) ====================
+
+    /** Build granit picker HTML for a step */
+    function buildGranitPickerHTML(step) {
+      let html = '<h4>Granit</h4><div class="granit-swatches">';
+      GRANITS.forEach(function(g) {
+        const sel = granitChoices[step] === g.id ? ' selected' : '';
+        html += '<div class="granit-swatch-item">' +
+          '<div class="granit-swatch' + sel + '" style="background:' + g.color + '" ' +
+          'onclick="selectGranit(' + step + ',\'' + g.id + '\')" title="' + g.nom + '"></div>' +
+          '<span class="granit-swatch-label">' + g.nom.split(' ')[0] + '</span></div>';
+      });
+      html += '</div>';
+      return html;
+    }
+
+    /** Render all granit pickers */
+    function renderGranitPickers() {
+      STEPS_WITH_GRANIT.forEach(function(step) {
+        var el = document.getElementById('granit-picker-' + step);
+        if (el) el.innerHTML = buildGranitPickerHTML(step);
+      });
+    }
+
+    /** Select a granit for a specific step */
+    function selectGranit(step, value) {
+      granitChoices[step] = value;
+      var container = document.getElementById('granit-picker-' + step);
+      container.querySelectorAll('.granit-swatch').forEach(function(s) { s.classList.remove('selected'); });
+      var swatches = container.querySelectorAll('.granit-swatch');
+      var idx = GRANITS.findIndex(function(g) { return g.id === value; });
+      if (idx >= 0 && swatches[idx]) swatches[idx].classList.add('selected');
+    }
+
+    // ==================== PORTES PICKERS (inline per module) ====================
+
+    /** Build portes picker HTML for a step */
+    function buildPortesPickerHTML(step) {
+      let html = '<h4>Matière des portes</h4><div class="granit-swatches">';
+      PORTES.forEach(function(p) {
+        const sel = portesChoices[step] === p.id ? ' selected' : '';
+        html += '<div class="granit-swatch-item">' +
+          '<div class="granit-swatch' + sel + '" style="background:' + p.color + '" ' +
+          'onclick="selectPortes(' + step + ',\'' + p.id + '\')" title="' + p.nom + '"></div>' +
+          '<span class="granit-swatch-label">' + p.nom.split(' ')[0] + '</span></div>';
+      });
+      html += '</div>';
+      return html;
+    }
+
+    /** Render portes pickers in module steps */
+    function renderPortesPickers() {
+      STEPS_WITH_PORTES.forEach(function(step) {
+        var el = document.getElementById('portes-picker-' + step);
+        if (el) el.innerHTML = buildPortesPickerHTML(step);
+      });
+    }
+
+    /** Select a portes material for a specific step */
+    function selectPortes(step, value) {
+      portesChoices[step] = value;
+      var container = document.getElementById('portes-picker-' + step);
+      container.querySelectorAll('.granit-swatch').forEach(function(s) { s.classList.remove('selected'); });
+      var swatches = container.querySelectorAll('.granit-swatch');
+      var idx = PORTES.findIndex(function(p) { return p.id === value; });
+      if (idx >= 0 && swatches[idx]) swatches[idx].classList.add('selected');
+    }
+
     // ==================== NAVIGATION ====================
     function nextStep() {
       if (currentStep === TOTAL) return;
@@ -803,8 +842,7 @@
       if (next === 1) next = 2;
       if (next === 4 && !showColonne()) next = 5;
       if (next === 6 && (!choices[3] || choices[3] === 'aucun')) next = 7;
-      if (next === 9) next = 10; // skip removed step 9
-      if (next === 11) next = 12; // skip step 11 (reserved for US-007 Portes)
+      if (next === 9) next = 12; // skip removed steps 9, 10, 11
       if (next === TOTAL) buildRecap();
       showStep(next);
     }
@@ -816,8 +854,9 @@
         return;
       }
       let prev = currentStep - 1;
-      if (prev === 11) prev = 10; // skip step 11 (reserved for US-007 Portes)
-      if (prev === 9) prev = 8; // skip removed step 9
+      if (prev === 11) prev = 8; // skip removed steps 11, 10, 9
+      if (prev === 10) prev = 8;
+      if (prev === 9) prev = 8;
       if (prev === 4 && !showColonne()) prev = 3;
       if (prev === 6 && (!choices[3] || choices[3] === 'aucun')) prev = 5;
       if (prev === 1) prev = 2;
@@ -871,7 +910,7 @@
     function buildRecap() {
       const l = v => labels[v] || v || '—';
 
-      const dispLabel = choices[1] === 'angle' ? 'Emeraude Angle' : 'Emeraude Rectangulaire';
+      const dispLabel = choices[1] === 'angle' ? 'Émeraude Angle' : 'Émeraude Rectangulaire';
       document.getElementById('recap-subtitle').textContent = 'Votre configuration ' + dispLabel;
       document.getElementById('recap-droit').textContent = l(choices[2]);
 
@@ -903,7 +942,28 @@
 
       document.getElementById('recap-recueillement').textContent = l(choices[7]);
       document.getElementById('recap-caveau').textContent = l(choices[8]);
-      document.getElementById('recap-granit').textContent = l(choices[10]);
+
+      // Granits par element
+      var granitHTML = '';
+      var granitLabels = { 2: 'Module droit', 3: 'Module gauche', 4: 'Colonne', 5: 'Banc droit', 6: 'Banc gauche', 7: 'Recueillement' };
+      STEPS_WITH_GRANIT.forEach(function(s) {
+        if (granitChoices[s]) {
+          granitHTML += '<div class="recap-row"><span class="label">Granit ' + granitLabels[s] + '</span>' +
+            '<span class="value">' + l(granitChoices[s]) + '</span></div>';
+        }
+      });
+      document.getElementById('recap-granits').innerHTML = granitHTML;
+
+      // Portes par module
+      var portesHTML = '';
+      var portesLabels = { 2: 'Module droit', 3: 'Module gauche' };
+      STEPS_WITH_PORTES.forEach(function(s) {
+        if (portesChoices[s]) {
+          portesHTML += '<div class="recap-row"><span class="label">Portes ' + portesLabels[s] + '</span>' +
+            '<span class="value">' + l(portesChoices[s]) + '</span></div>';
+        }
+      });
+      document.getElementById('recap-portes-list').innerHTML = portesHTML;
     }
 
     // ==================== SAVE CONFIG & NAVIGATE ====================
@@ -920,7 +980,8 @@
         bancGauche: choices[6],
         recueillement: choices[7],
         caveau: choices[8],
-        granit: choices[10],
+        granits: Object.assign({}, granitChoices),
+        portes: Object.assign({}, portesChoices),
         labels: labels
       };
       localStorage.setItem('icollectivites_config', JSON.stringify(config));
@@ -936,6 +997,10 @@
 
       choices[1] = disposition;
 
+      // Render granit and portes pickers in all steps
+      renderGranitPickers();
+      renderPortesPickers();
+
       // Restore choices from localStorage if available (returning from devis)
       const saved = localStorage.getItem('icollectivites_config');
       if (saved) {
@@ -948,13 +1013,19 @@
           if (config.bancGauche) { select(6, config.bancGauche); }
           if (config.recueillement) { select(7, config.recueillement); }
           if (config.caveau) { select(8, config.caveau); }
-          if (config.granit) { select(10, config.granit); }
-          // Return to recap if all steps were completed
-          if (config.granit) {
-            buildRecap();
-            showStep(TOTAL);
-            return;
+          // Restore granit choices per element
+          if (config.granits) {
+            STEPS_WITH_GRANIT.forEach(function(s) {
+              if (config.granits[s]) selectGranit(s, config.granits[s]);
+            });
           }
+          // Restore portes choices per module
+          if (config.portes && typeof config.portes === 'object') {
+            STEPS_WITH_PORTES.forEach(function(s) {
+              if (config.portes[s]) selectPortes(s, config.portes[s]);
+            });
+          }
+          // Config restored but always start on step 2
         } catch (e) { /* ignore parse errors */ }
       }
 

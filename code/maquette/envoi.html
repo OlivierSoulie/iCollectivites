@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>CIMTEA — Envoi du devis</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: row;
+      background: #1a1a1e;
+      padding-top: 56px;
+    }
+
+    /* --- Panneau recap gauche --- */
+    .recap-panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px;
+      -webkit-overflow-scrolling: touch;
+      background: linear-gradient(145deg, #2c2c30 0%, #1a1a1e 50%, #0d0d0f 100%);
+    }
+
+    .recap-panel::-webkit-scrollbar { display: none; }
+
+    .recap-panel h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 8px;
+    }
+
+    .recap-panel .recap-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 24px;
+    }
+
+    .recap-card {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .recap-card h3 {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .recap-card .recap-line {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px;
+    }
+
+    .recap-card .recap-line:last-child { border-bottom: none; }
+
+    .recap-card .recap-line .rl-label {
+      color: rgba(255,255,255,0.5);
+    }
+
+    .recap-card .recap-line .rl-value {
+      color: white;
+      font-weight: 500;
+    }
+
+    /* --- Bottom row: image + config side by side --- */
+    .recap-bottom-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .recap-image-card {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .recap-config-card {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .project-image-placeholder {
+      background: rgba(255,255,255,0.04);
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: var(--radius-sm);
+      padding: 32px 16px;
+      text-align: center;
+      color: rgba(255,255,255,0.3);
+    }
+
+    .project-image-placeholder .pi-icon {
+      font-size: 48px;
+      line-height: 1;
+      margin-bottom: 8px;
+      opacity: 0.4;
+    }
+
+    .project-image-placeholder .pi-text {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* --- Sidebar envoi droite --- */
+    .envoi-sidebar {
+      width: var(--sidebar-width);
+      height: calc(100vh - 56px); height: calc(100dvh - 56px);
+      background: var(--glass-strong);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border-left: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .envoi-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 16px 20px 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .envoi-scroll::-webkit-scrollbar { display: none; }
+
+    .section-heading {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .section-sub {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .form-card {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .form-card h4 {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group:last-child { margin-bottom: 0; }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 44px;
+      background: white;
+      border: 1px solid var(--separator);
+      border-radius: 10px;
+      padding: 0 14px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.15s;
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .form-input[readonly] {
+      background: var(--bg);
+      color: var(--text-secondary);
+      cursor: not-allowed;
+    }
+
+    /* --- Footer --- */
+    .envoi-footer {
+      padding: 12px 20px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--separator);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .envoi-footer .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* --- Success overlay --- */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+
+    .success-overlay.visible { display: flex; }
+
+    .success-box {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      max-width: 360px;
+      width: 90%;
+    }
+
+    .success-box .sb-icon {
+      font-size: 64px;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+
+    .success-box h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .success-box p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin-bottom: 24px;
+    }
+
+    .success-box .btn {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar (ADR-003) -->
+  <nav class="topbar">
+    <button class="topbar-back" onclick="goBack()" title="Retour">
+      <svg viewBox="0 0 8 14"><polyline points="7,1 1,7 7,13"/></svg>
+    </button>
+    <div class="topbar-breadcrumb" id="topbarBreadcrumb">
+      <a href="index.html">iCollectivites</a>
+      <span class="tb-sep">&#9656;</span>
+      <a href="catalogue.html?besoin=columbarium">Columbarium</a>
+      <span class="tb-sep">&#9656;</span>
+      <span class="tb-active">Envoi du devis</span>
+    </div>
+    <a class="topbar-logo" href="index.html">CIMTEA</a>
+  </nav>
+
+  <!-- Panneau recap (gauche) -->
+  <div class="recap-panel">
+    <h2 id="recapTitle">Récapitulatif du devis</h2>
+    <p class="recap-sub" id="recapProjectName">—</p>
+
+    <div class="recap-card" id="recapInfos">
+      <h3>Informations projet</h3>
+      <div id="recapInfosLines"></div>
+    </div>
+
+    <div class="recap-bottom-row">
+      <div class="recap-card recap-image-card">
+        <h3>Aperçu du projet</h3>
+        <div class="project-image-placeholder">
+          <div class="pi-icon">&#9965;</div>
+          <div class="pi-text">Visualisation 3D</div>
+        </div>
+      </div>
+      <div class="recap-card recap-config-card" id="recapConfig">
+        <h3>Configuration</h3>
+        <div id="recapConfigLines"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar envoi (droite) -->
+  <div class="envoi-sidebar">
+    <div class="envoi-scroll">
+
+      <h2 class="section-heading">Envoyer le devis</h2>
+      <p class="section-sub">Le dossier sera envoyé par email au client.</p>
+
+      <div class="form-card">
+        <h4>Destinataire</h4>
+
+        <div class="form-group">
+          <label>Email client</label>
+          <input type="email" class="form-input" id="inputEmailTo" placeholder="email@commune.fr">
+        </div>
+
+        <div class="form-group">
+          <label>Copie CIMTEA (automatique)</label>
+          <input type="email" class="form-input" id="inputEmailCc" value="commercial@cimtea.fr" readonly>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h4>Message</h4>
+
+        <div class="form-group">
+          <label>Objet</label>
+          <input type="text" class="form-input" id="inputObjet" readonly>
+        </div>
+      </div>
+
+    </div><!-- /envoi-scroll -->
+
+    <!-- Footer -->
+    <div class="envoi-footer">
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goBack()" title="Retour">
+          <svg viewBox="0 0 12 18"><polyline points="10,2 2,9 10,16"/></svg>
+        </button>
+        <button class="btn btn-primary" onclick="sendDevis()">
+          Envoyer le devis
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /envoi-sidebar -->
+
+  <!-- Success overlay -->
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-box">
+      <div class="sb-icon">&#9989;</div>
+      <h2>Devis envoyé !</h2>
+      <p id="successMessage">Le dossier a été envoyé avec succès.</p>
+      <button class="btn btn-primary" onclick="newProject()">Nouveau projet</button>
+    </div>
+  </div>
+
+  <script>
+    // ==================== LOAD DATA ====================
+
+    /** Load config from localStorage */
+    function loadConfig() {
+      try { return JSON.parse(localStorage.getItem('icollectivites_config')); }
+      catch (e) { return null; }
+    }
+
+    /** Load devis data from localStorage */
+    function loadDevis() {
+      try { return JSON.parse(localStorage.getItem('icollectivites_devis')); }
+      catch (e) { return null; }
+    }
+
+    // ==================== RENDER RECAP ====================
+
+    /** Build a recap line HTML */
+    function recapLine(label, value) {
+      return '<div class="recap-line">' +
+        '<span class="rl-label">' + label + '</span>' +
+        '<span class="rl-value">' + (value || '—') + '</span>' +
+        '</div>';
+    }
+
+    /** Render config recap in left panel */
+    function renderConfigRecap(config) {
+      if (!config) return;
+      const labels = config.labels || {};
+      const l = function(v) { return labels[v] || v || '—'; };
+      let html = '';
+
+      html += recapLine('Disposition', l(config.disposition));
+      html += recapLine('Module droit', l(config.moduleDroit));
+      if (config.moduleGauche && config.moduleGauche !== 'aucun') {
+        html += recapLine('Module gauche', l(config.moduleGauche));
+      }
+      if (config.colonne && config.colonne !== 'non') {
+        html += recapLine('Colonne', l(config.colonne));
+      }
+      if (config.bancDroit && config.bancDroit !== 'aucun') {
+        html += recapLine('Banc droit', l(config.bancDroit));
+      }
+      if (config.bancGauche && config.bancGauche !== 'aucun') {
+        html += recapLine('Banc gauche', l(config.bancGauche));
+      }
+      if (config.recueillement && config.recueillement !== 'aucun') {
+        html += recapLine('Recueillement', l(config.recueillement));
+      }
+      if (config.caveau && config.caveau !== 'aucun') {
+        html += recapLine('Caveau', l(config.caveau));
+      }
+      if (config.granits) {
+        var gLabels = { 2: 'Module droit', 3: 'Module gauche', 4: 'Colonne', 5: 'Banc droit', 6: 'Banc gauche', 7: 'Recueillement' };
+        [2, 3, 4, 5, 6, 7].forEach(function(s) {
+          if (config.granits[s]) {
+            html += recapLine('Granit ' + gLabels[s], l(config.granits[s]));
+          }
+        });
+      }
+      if (config.portes && typeof config.portes === 'object') {
+        var pLabels = { 2: 'Module droit', 3: 'Module gauche' };
+        [2, 3].forEach(function(s) {
+          if (config.portes[s]) {
+            html += recapLine('Portes ' + pLabels[s], l(config.portes[s]));
+          }
+        });
+      }
+
+      document.getElementById('recapConfigLines').innerHTML = html;
+    }
+
+    /** Render devis infos in left panel */
+    function renderInfosRecap(devis) {
+      if (!devis) return;
+      let html = '';
+
+      html += recapLine('Client', devis.nomClient);
+      html += recapLine('Email', devis.email);
+      html += recapLine('Commune', devis.commune);
+      html += recapLine('Référence', devis.reference || '—');
+      html += recapLine('Remise', (devis.remise || '0') + ' %');
+      html += recapLine('Forfait pose', devis.forfait ? devis.forfait.charAt(0).toUpperCase() + devis.forfait.slice(1) : '—');
+      if (devis.commentaires) {
+        html += recapLine('Commentaires', devis.commentaires);
+      }
+
+      document.getElementById('recapInfosLines').innerHTML = html;
+    }
+
+    // ==================== SEND ====================
+
+    /** Simulate sending the devis */
+    function sendDevis() {
+      const emailTo = document.getElementById('inputEmailTo').value.trim();
+      document.getElementById('successMessage').textContent =
+        'Le dossier a été envoyé à ' + emailTo + ' avec copie à commercial@cimtea.fr.';
+      document.getElementById('successOverlay').classList.add('visible');
+    }
+
+    /** Start a new project — clear localStorage and go to index */
+    function newProject() {
+      localStorage.removeItem('icollectivites_config');
+      localStorage.removeItem('icollectivites_devis');
+      localStorage.removeItem('icollectivites_besoin');
+      localStorage.removeItem('icollectivites_produit');
+      window.location.href = 'index.html';
+    }
+
+    // ==================== NAVIGATION ====================
+
+    /** Go back to devis page */
+    function goBack() {
+      window.location.href = 'devis.html';
+    }
+
+    // ==================== INIT ====================
+
+    const config = loadConfig();
+    const devis = loadDevis();
+
+    if (!config || !devis) {
+      window.location.href = 'index.html';
+    }
+
+    // Render recaps
+    renderConfigRecap(config);
+    renderInfosRecap(devis);
+
+    // Set project name in title and subtitle
+    var projectName = devis.nomProjet || '—';
+    document.getElementById('recapTitle').textContent = projectName;
+    document.getElementById('recapProjectName').textContent = 'Commune de ' + (devis.commune || '—');
+
+    // Pre-fill email from devis
+    document.getElementById('inputEmailTo').value = devis.email || '';
+
+    // Auto-generate objet
+    document.getElementById('inputObjet').value =
+      'Devis CIMTEA — ' + (devis.commune || 'Projet') + ' — ' + (devis.nomProjet || '');
+  </script>
+
+</body>
+</html>

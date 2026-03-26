@@ -240,6 +240,64 @@ body {
   box-shadow: 0 0 0 2px var(--primary);
 }
 
+/* --- Granit picker inline (dans chaque etape) --- */
+.granit-picker {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--separator);
+}
+
+.granit-picker h4 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+}
+
+.granit-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.granit-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.granit-swatch:hover {
+  transform: scale(1.1);
+}
+
+.granit-swatch.selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.granit-swatch-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 2px;
+  width: 36px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.granit-swatch-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /* --- Condition note --- */
 .condition-note {
   background: rgba(255,149,0,0.08);

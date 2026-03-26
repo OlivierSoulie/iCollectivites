@@ -336,11 +336,11 @@
     <div class="photo-placeholder">
       <div class="ph-icon">&#128247;</div>
       <div class="ph-text">Photo du site</div>
-      <div class="ph-hint">Placement AR du columbarium — bientot disponible</div>
+      <div class="ph-hint">Placement AR du columbarium — bientôt disponible</div>
     </div>
     <div class="photo-toolbar">
-      <button class="vp-btn" title="Prendre une photo — bientot disponible" disabled>&#128247;</button>
-      <button class="vp-btn" title="Galerie — bientot disponible" disabled>AR</button>
+      <button class="vp-btn" title="Prendre une photo — bientôt disponible" disabled>&#128247;</button>
+      <button class="vp-btn" title="Galerie — bientôt disponible" disabled>AR</button>
     </div>
   </div>
 
@@ -348,37 +348,49 @@
   <div class="devis-sidebar">
   <div class="devis-scroll">
 
-    <!-- Recap config (T2) -->
-    <div class="config-recap" id="configRecap">
-      <h3>Configuration selectionnee</h3>
-      <div class="recap-grid" id="recapGrid"></div>
-    </div>
-
-    <!-- Formulaire (T3) -->
     <h2 class="section-heading">Informations projet</h2>
-    <p class="section-sub">Completez les informations pour generer votre devis.</p>
+    <p class="section-sub">Complétez les informations pour générer votre devis.</p>
 
     <div class="form-card">
-      <h4>Projet</h4>
+      <h4>Commune</h4>
 
       <div class="form-group">
         <label>Commune <span class="required">*</span></label>
         <input type="text" class="form-input" id="inputCommune" placeholder="Nom de la commune" oninput="onCommuneChange()">
       </div>
+    </div>
+
+    <div class="form-card">
+      <h4>Client</h4>
 
       <div class="form-group">
-        <label>Nom du projet</label>
-        <input type="text" class="form-input" id="inputNomProjet" placeholder="CIMTEA-2026-...">
+        <label>Nom du contact <span class="required">*</span></label>
+        <input type="text" class="form-input" id="inputNomClient" placeholder="Nom du contact">
       </div>
 
       <div class="form-group">
-        <label>Reference</label>
-        <input type="text" class="form-input" id="inputReference" placeholder="Reference interne (optionnel)">
+        <label>Email <span class="required">*</span></label>
+        <input type="email" class="form-input" id="inputEmail" placeholder="email@commune.fr" oninput="validateEmail(this)">
+      </div>
+
+      <div class="form-group">
+        <label>Référence</label>
+        <input type="text" class="form-input" id="inputReference" placeholder="Référence interne (optionnel)">
+      </div>
+
+      <div class="form-group">
+        <label>Commentaires</label>
+        <textarea class="form-input" id="inputCommentaires" placeholder="Notes, contraintes, demandes particulières..." style="height:88px;padding:12px 14px;resize:vertical"></textarea>
       </div>
     </div>
 
     <div class="form-card">
       <h4>Conditions commerciales</h4>
+
+      <div class="form-group">
+        <label>Nom du projet</label>
+        <input type="text" class="form-input" id="inputNomProjet" placeholder="CIMTEA-2026-...">
+      </div>
 
       <div class="form-group">
         <label>Taux de remise</label>
@@ -401,7 +413,7 @@
           </div>
           <div class="radio-option" onclick="selectForfait('difficile')" id="forfait-difficile">
             <h5>Difficile</h5>
-            <p>Acces complexe</p>
+            <p>Accès complexe</p>
           </div>
         </div>
       </div>
@@ -415,7 +427,7 @@
         <svg viewBox="0 0 12 18"><polyline points="10,2 2,9 10,16"/></svg>
       </button>
       <button class="btn btn-primary" id="btnGenerate" onclick="generateDevis()">
-        Generer le devis
+        Générer le devis
       </button>
     </div>
 
@@ -478,8 +490,24 @@
         items.push({ label: 'Caveau', value: l(config.caveau) });
       }
 
-      if (config.granit) {
-        items.push({ label: 'Granit corps', value: l(config.granit) });
+      // Granits par element
+      if (config.granits) {
+        var gLabels = { 2: 'Module droit', 3: 'Module gauche', 4: 'Colonne', 5: 'Banc droit', 6: 'Banc gauche', 7: 'Recueillement' };
+        [2, 3, 4, 5, 6, 7].forEach(function(s) {
+          if (config.granits[s]) {
+            items.push({ label: 'Granit ' + gLabels[s], value: l(config.granits[s]) });
+          }
+        });
+      }
+
+      // Portes par module
+      if (config.portes && typeof config.portes === 'object') {
+        var pLabels = { 2: 'Module droit', 3: 'Module gauche' };
+        [2, 3].forEach(function(s) {
+          if (config.portes[s]) {
+            items.push({ label: 'Portes ' + pLabels[s], value: l(config.portes[s]) });
+          }
+        });
       }
 
       grid.innerHTML = items.map(function(item) {
@@ -494,7 +522,7 @@
     function updateTopbar(config) {
       if (!config) return;
       const produit = config.produit || '';
-      const produitLabel = produit.includes('angle') ? 'Emeraude Angle' : 'Emeraude Rect.';
+      const produitLabel = produit.includes('angle') ? 'Émeraude Angle' : 'Émeraude Rect.';
       const bc = document.getElementById('topbarBreadcrumb');
 
       bc.innerHTML =
@@ -549,7 +577,19 @@
       selectedForfait = type;
     }
 
-    // ==================== GENERATE DEVIS (T4 — bouchonne) ====================
+    // ==================== EMAIL VALIDATION (US-014) ====================
+
+    /** Validate email format */
+    function validateEmail(input) {
+      const email = input.value.trim();
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        input.classList.add('invalid');
+      } else {
+        input.classList.remove('invalid');
+      }
+    }
+
+    // ==================== GENERATE DEVIS ====================
 
     /** Show a toast notification */
     function showToast(message) {
@@ -561,8 +601,60 @@
       }, 3000);
     }
 
-    /** Generate devis — bouchonne pour Sprint #1 */
+    /** Save devis form data to localStorage */
+    function saveDevisData() {
+      const data = {
+        nomClient: document.getElementById('inputNomClient').value.trim(),
+        email: document.getElementById('inputEmail').value.trim(),
+        commune: document.getElementById('inputCommune').value.trim(),
+        nomProjet: document.getElementById('inputNomProjet').value.trim(),
+        reference: document.getElementById('inputReference').value.trim(),
+        commentaires: document.getElementById('inputCommentaires').value.trim(),
+        remise: document.getElementById('inputRemise').value,
+        forfait: selectedForfait
+      };
+      localStorage.setItem('icollectivites_devis', JSON.stringify(data));
+      return data;
+    }
+
+    /** Restore devis form data from localStorage */
+    function restoreDevisData() {
+      const raw = localStorage.getItem('icollectivites_devis');
+      if (!raw) return;
+      try {
+        const data = JSON.parse(raw);
+        if (data.nomClient) document.getElementById('inputNomClient').value = data.nomClient;
+        if (data.email) document.getElementById('inputEmail').value = data.email;
+        if (data.commune) document.getElementById('inputCommune').value = data.commune;
+        if (data.nomProjet) {
+          document.getElementById('inputNomProjet').value = data.nomProjet;
+          document.getElementById('inputNomProjet').dataset.edited = 'true';
+        }
+        if (data.reference) document.getElementById('inputReference').value = data.reference;
+        if (data.commentaires) document.getElementById('inputCommentaires').value = data.commentaires;
+        if (data.remise) document.getElementById('inputRemise').value = data.remise;
+        if (data.forfait) selectForfait(data.forfait);
+      } catch (e) { /* ignore */ }
+    }
+
+    /** Validate and navigate to envoi page */
     function generateDevis() {
+      const nomClient = document.getElementById('inputNomClient').value.trim();
+      if (!nomClient) {
+        document.getElementById('inputNomClient').classList.add('invalid');
+        document.getElementById('inputNomClient').focus();
+        showToast('Veuillez renseigner le nom du client');
+        return;
+      }
+
+      const email = document.getElementById('inputEmail').value.trim();
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        document.getElementById('inputEmail').classList.add('invalid');
+        document.getElementById('inputEmail').focus();
+        showToast('Veuillez renseigner un email valide');
+        return;
+      }
+
       const commune = document.getElementById('inputCommune').value.trim();
       if (!commune) {
         document.getElementById('inputCommune').classList.add('invalid');
@@ -571,7 +663,8 @@
         return;
       }
 
-      showToast('Generation du devis — bientot disponible');
+      saveDevisData();
+      window.location.href = 'envoi.html';
     }
 
     // ==================== NAVIGATION (T4) ====================
@@ -591,18 +684,23 @@
     const config = loadConfig();
     renderRecap(config);
     updateTopbar(config);
+    restoreDevisData();
 
-    // Set default project name
-    document.getElementById('inputNomProjet').value = generateProjectName('');
+    // Set default project name if not restored
+    if (!document.getElementById('inputNomProjet').value) {
+      document.getElementById('inputNomProjet').value = generateProjectName('');
+    }
 
     // Mark name as manually edited if user types in it
     document.getElementById('inputNomProjet').addEventListener('input', function() {
       this.dataset.edited = 'true';
     });
 
-    // Remove invalid state on commune input
-    document.getElementById('inputCommune').addEventListener('input', function() {
-      this.classList.remove('invalid');
+    // Remove invalid state on inputs
+    ['inputNomClient', 'inputEmail', 'inputCommune'].forEach(function(id) {
+      document.getElementById(id).addEventListener('input', function() {
+        this.classList.remove('invalid');
+      });
     });
   </script>
 

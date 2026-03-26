@@ -91,7 +91,7 @@
       gap: 14px;
     }
 
-    /* --- Cards generiques --- */
+    /* --- Cards génériques --- */
     .cat-card {
       background: rgba(255,255,255,0.06);
       backdrop-filter: blur(20px);
@@ -201,7 +201,7 @@
       <svg viewBox="0 0 8 14"><polyline points="7,1 1,7 7,13"/></svg>
     </button>
     <div class="topbar-breadcrumb" id="topbarBreadcrumb">
-      <a href="index.html">iCollectivites</a>
+      <a href="index.html">iCollectivités</a>
       <span class="tb-sep">&#9656;</span>
       <span class="tb-active" id="tbCurrent">Columbarium</span>
     </div>
@@ -229,12 +229,12 @@
       <div class="catalogue-grid" id="gridProduits"></div>
     </div>
 
-    <!-- Resultats recherche -->
+    <!-- Résultats recherche -->
     <div id="viewSearch" style="display:none">
       <div class="catalogue-grid" id="gridSearch"></div>
       <div class="no-results" id="noResults" style="display:none">
         <div class="nr-icon">&#128270;</div>
-        <p>Aucun resultat pour cette recherche.</p>
+        <p>Aucun résultat pour cette recherche.</p>
       </div>
     </div>
 
@@ -252,22 +252,22 @@
     const GAMMES = [
       {
         id: 'emeraude',
-        nom: 'Emeraude',
+        nom: 'Émeraude',
         icon: '&#9645;',
-        desc: 'Lignes contemporaines, colonnes elegantes',
+        desc: 'Lignes contemporaines, colonnes élégantes',
         info: '3 variantes',
         active: true,
         produits: [
-          { id: 'emeraude-rect', nom: 'Rectangulaire', icon: '&#9645;', desc: 'Implantation lineaire classique', info: '7 a 18 cases', active: true },
-          { id: 'emeraude-angle', nom: 'Angle (L)', icon: '&#8735;', desc: 'Implantation en equerre', info: '7 a 12 cases', active: true },
-          { id: 'emeraude-courbe', nom: 'Courbe', icon: '&#8978;', desc: 'Convexe ou concave', info: '12 a 18 cases', active: false }
+          { id: 'emeraude-rect', nom: 'Rectangulaire', icon: '&#9645;', desc: 'Implantation linéaire classique', info: '7 à 18 cases', active: true },
+          { id: 'emeraude-angle', nom: 'Angle (L)', icon: '&#8735;', desc: 'Implantation en équerre', info: '7 à 12 cases', active: true },
+          { id: 'emeraude-courbe', nom: 'Courbe', icon: '&#8978;', desc: 'Convexe ou concave', info: '12 à 18 cases', active: false }
         ]
       },
       {
         id: 'saphir',
         nom: 'Saphir',
         icon: '&#9670;',
-        desc: 'Pret a poser, montage 1h30',
+        desc: 'Prêt à poser, montage 1h30',
         info: '6, 12, 18 cases',
         active: false,
         produits: [
@@ -298,7 +298,7 @@
         id: 'fuji', nom: 'Fuji', icon: '&#9651;', desc: 'Pyramidal', info: '', active: false, produits: []
       },
       {
-        id: 'sfera', nom: 'Sfera', icon: '&#9673;', desc: 'Spherique', info: '', active: false, produits: []
+        id: 'sfera', nom: 'Sfera', icon: '&#9673;', desc: 'Sphérique', info: '', active: false, produits: []
       },
       {
         id: 'rubis', nom: 'Rubis', icon: '&#9632;', desc: '', info: '', active: false, produits: []
@@ -313,7 +313,7 @@
         id: 'grenat', nom: 'Grenat', icon: '&#9830;', desc: '', info: '', active: false, produits: []
       },
       {
-        id: 'chatel', nom: 'Chatel', icon: '&#9644;', desc: '', info: '', active: false, produits: []
+        id: 'chatel', nom: 'Châtel', icon: '&#9644;', desc: '', info: '', active: false, produits: []
       },
       {
         id: 'diamant', nom: 'Diamant', icon: '&#9672;', desc: '', info: '', active: false, produits: []
@@ -328,7 +328,7 @@
         id: 'turquoise', nom: 'Turquoise', icon: '&#8978;', desc: 'Courbe', info: '', active: false, produits: []
       },
       {
-        id: 'venetie', nom: 'Venetie', icon: '&#9646;', desc: 'Double face', info: '', active: false, produits: []
+        id: 'venetie', nom: 'Vénétie', icon: '&#9646;', desc: 'Double face', info: '', active: false, produits: []
       }
     ];
 
@@ -345,7 +345,7 @@
       const cls = 'cat-card' + (disabled ? ' disabled' : '');
       const badge = item.active
         ? '<span class="card-badge available">Disponible</span>'
-        : '<span class="card-badge soon">Bientot disponible</span>';
+        : '<span class="card-badge soon">Bientôt disponible</span>';
       const info = item.info ? `<span class="card-info">${item.info}</span>` : '';
       const click = disabled ? '' : `onclick="${onClick}"`;
 
@@ -455,6 +455,12 @@
 
     /** Save product to localStorage and go to configurator */
     function selectProduct(productId) {
+      // RAZ config si on change de produit
+      var prev = localStorage.getItem('icollectivites_produit');
+      if (prev && prev !== productId) {
+        localStorage.removeItem('icollectivites_config');
+        localStorage.removeItem('icollectivites_devis');
+      }
       localStorage.setItem('icollectivites_produit', productId);
       window.location.href = 'configurateur.html?produit=' + encodeURIComponent(productId);
     }
@@ -521,14 +527,14 @@
 
       if (gammeName) {
         bc.innerHTML =
-          '<a href="index.html">iCollectivites</a>' +
+          '<a href="index.html">iCollectivités</a>' +
           '<span class="tb-sep">&#9656;</span>' +
           '<a onclick="showGammesList()" style="cursor:pointer">' + besoinLabel + '</a>' +
           '<span class="tb-sep">&#9656;</span>' +
           '<span class="tb-active">' + gammeName + '</span>';
       } else {
         bc.innerHTML =
-          '<a href="index.html">iCollectivites</a>' +
+          '<a href="index.html">iCollectivités</a>' +
           '<span class="tb-sep">&#9656;</span>' +
           '<span class="tb-active">' + besoinLabel + '</span>';
       }
