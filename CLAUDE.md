@@ -95,11 +95,20 @@ Suivre le workflow Scrumban :
 
 ## Metriques
 
-- **Sprint #0 (Cadrage)** : 11 SP livres, 3 US Done
-- **Sprint #1 (Parcours)** : 10 SP livres, 3 US Done
-- **Velocity** : 10.5 SP/sprint
-- **Backlog restant** : 7 US / 38 SP
-- **Total projet** : 13 US / 59 SP (6 Done, 7 To Do)
+- **Sprint #0 (Cadrage)** : 11 SP livrés, 3 US Done
+- **Sprint #1 (Parcours)** : 10 SP livrés, 3 US Done
+- **Sprint #2 (Personnalisation + Devis)** : 10 SP livrés, 4 US Done
+- **Velocity** : 10.3 SP/sprint
+- **Backlog restant** : 4 US / 26 SP
+- **Total projet** : 14 US / 57 SP (10 Done, 4 To Do)
+
+---
+
+## Regles critiques
+
+- **JAMAIS commiter sans validation stakeholder** : DEV fait le code → montre au stakeholder → stakeholder valide → ALORS commit + push. Aucune exception.
+- **Tous les textes en français avec accents** : C'est une application française. Tous les textes visibles (titres, labels, placeholders, boutons, messages) DOIVENT être en français correct avec accents (é, è, ê, à, ù, ç, etc.). Pas de texte sans accent.
+- Si le dossier memory n'est pas trouve dans `~/.claude/projects/`, chercher dans le repo : `.claude/projects/.../memory/`
 
 ---
 

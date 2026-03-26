@@ -1,9 +1,9 @@
 # Kanban Board - CIMTEA iCollectivites
 
 **Projet** : 016-CIMTEA configurateur
-**Sprint** : Sprint #1 — TERMINE
-**Sprint Goal** : Completer le parcours utilisateur multi-ecrans avec navigation coherente
-**Derniere mise a jour** : 25/03/2026
+**Sprint** : Sprint #2
+**Sprint Goal** : Completer la personnalisation (granit, portes) et le cycle devis complet (formulaire enrichi + envoi simule)
+**Derniere mise a jour** : 26/03/2026
 
 ---
 
@@ -28,6 +28,19 @@
 ## Testing
 
 (vide)
+
+---
+
+## Done (Sprint #2)
+
+| US | Titre | SP | Validation |
+|---|---|---|---|
+| US-006 | Choix granit (inline par élément) | 3 | Stakeholder validé 26/03/2026 |
+| US-007 | Choix portes (inline modules) | 3 | Stakeholder validé 26/03/2026 |
+| US-014 | Complément formulaire devis | 2 | Stakeholder validé 26/03/2026 |
+| US-013 | Écran 5 — Envoi email simulé | 2 | Stakeholder validé 26/03/2026 |
+
+**SP livrés Sprint #2** : 10/10 SP (100%)
 
 ---
 
