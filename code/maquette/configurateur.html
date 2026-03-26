@@ -537,8 +537,73 @@
         </div>
       </div>
 
-      <!-- ===== ETAPE 9 : Recapitulatif ===== -->
-      <div class="step" id="step-9">
+      <!-- ===== ETAPE 10 : Granit du corps (US-006) ===== -->
+      <div class="step" id="step-10">
+        <div class="sidebar-header">
+          <h2>Granit du corps</h2>
+          <p>Coloris du granit pour le corps du columbarium.</p>
+        </div>
+        <div style="height:16px"></div>
+        <div class="options grid-3">
+          <div class="option-card" onclick="select(10,'rose-porrino')" id="opt-10-rose-porrino">
+            <span class="color-swatch" style="background:#c4867a"></span>
+            <div class="opt-content">
+              <h3>Rose Porrino</h3>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(10,'balmoral')" id="opt-10-balmoral">
+            <span class="color-swatch" style="background:#8b6f5e"></span>
+            <div class="opt-content">
+              <h3>Balmoral</h3>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(10,'bianco-carrara')" id="opt-10-bianco-carrara">
+            <span class="color-swatch" style="background:#e8e4df"></span>
+            <div class="opt-content">
+              <h3>Bianco Carrara</h3>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(10,'crema-julia')" id="opt-10-crema-julia">
+            <span class="color-swatch" style="background:#d4c4a8"></span>
+            <div class="opt-content">
+              <h3>Crema Julia</h3>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(10,'kriscon-chocolat')" id="opt-10-kriscon-chocolat">
+            <span class="color-swatch" style="background:#4a3728"></span>
+            <div class="opt-content">
+              <h3>Kriscon Chocolat</h3>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(10,'labrador-vert')" id="opt-10-labrador-vert">
+            <span class="color-swatch" style="background:#2d4a3e"></span>
+            <div class="opt-content">
+              <h3>Labrador Vert</h3>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(10,'noir-absolu-extra')" id="opt-10-noir-absolu-extra">
+            <span class="color-swatch" style="background:#1a1a1a"></span>
+            <div class="opt-content">
+              <h3>Noir Absolu Extra</h3>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(10,'tarn-gris')" id="opt-10-tarn-gris">
+            <span class="color-swatch" style="background:#7a7a7a"></span>
+            <div class="opt-content">
+              <h3>Tarn Gris</h3>
+            </div>
+          </div>
+          <div class="option-card" onclick="select(10,'tarn-marron')" id="opt-10-tarn-marron">
+            <span class="color-swatch" style="background:#6b4e3d"></span>
+            <div class="opt-content">
+              <h3>Tarn Marron</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== ETAPE 12 : Recapitulatif (renumerote depuis step-9) ===== -->
+      <div class="step" id="step-12">
         <div class="sidebar-header">
           <h2>Recapitulatif</h2>
           <p id="recap-subtitle">Votre configuration Emeraude.</p>
@@ -584,6 +649,14 @@
             <span class="value" id="recap-caveau">—</span>
           </div>
         </div>
+
+        <div class="recap-section">
+          <h4>Finitions</h4>
+          <div class="recap-row">
+            <span class="label">Granit corps</span>
+            <span class="value" id="recap-granit">—</span>
+          </div>
+        </div>
       </div>
 
     </div><!-- /sidebar-scroll -->
@@ -604,12 +677,13 @@
   <script>
     // ==================== STATE ====================
     let currentStep = 0;
-    const TOTAL = 9;
+    const TOTAL = 12;
     const choices = {};
 
     const stepNames = [
       '','','Module droit','Module gauche',
-      'Colonne','Banc droit','Banc gauche','Recueillement','Caveau','Recapitulatif'
+      'Colonne','Banc droit','Banc gauche','Recueillement','Caveau',
+      '','Granit du corps','','Recapitulatif'
     ];
 
     const labels = {
@@ -618,7 +692,10 @@
       'oui':'Oui','non':'Non',
       'berlin':'Banc Berlin','saphir':'Banc Saphir 120',
       'idealo':'IDEALO 2023',
-      'simple-fond':'Simple 27cm (fond)','simple-sans':'Simple 27cm (ouvert)','double':'Double 54cm'
+      'simple-fond':'Simple 27cm (fond)','simple-sans':'Simple 27cm (ouvert)','double':'Double 54cm',
+      'rose-porrino':'Rose Porrino','balmoral':'Balmoral','bianco-carrara':'Bianco Carrara',
+      'crema-julia':'Crema Julia','kriscon-chocolat':'Kriscon Chocolat','labrador-vert':'Labrador Vert',
+      'noir-absolu-extra':'Noir Absolu Extra','tarn-gris':'Tarn Gris','tarn-marron':'Tarn Marron'
     };
 
     // ==================== TOPBAR (ADR-003) ====================
@@ -647,7 +724,8 @@
       6: 'Banc G',
       7: 'Recueil.',
       8: 'Caveau',
-      9: 'Recap'
+      10: 'Granit',
+      12: 'Recap'
     };
 
     /** Get display value for a completed step */
@@ -705,7 +783,7 @@
       if (showColonne()) steps.push(4);
       steps.push(5);
       if (choices[3] && choices[3] !== 'aucun') steps.push(6);
-      steps.push(7, 8, 9);
+      steps.push(7, 8, 10, 12);
       return steps;
     }
 
@@ -722,24 +800,27 @@
     function nextStep() {
       if (currentStep === TOTAL) return;
       let next = currentStep + 1;
-      if (next === 1) next = 2; // skip removed step 1
+      if (next === 1) next = 2;
       if (next === 4 && !showColonne()) next = 5;
       if (next === 6 && (!choices[3] || choices[3] === 'aucun')) next = 7;
+      if (next === 9) next = 10; // skip removed step 9
+      if (next === 11) next = 12; // skip step 11 (reserved for US-007 Portes)
       if (next === TOTAL) buildRecap();
       showStep(next);
     }
 
     function prevStep() {
       if (currentStep <= 0) return;
-      // From step 2 (first visible step), go back to catalogue gamme Emeraude
       if (currentStep === 2) {
         window.location.href = 'catalogue.html?besoin=columbarium&gamme=emeraude';
         return;
       }
       let prev = currentStep - 1;
+      if (prev === 11) prev = 10; // skip step 11 (reserved for US-007 Portes)
+      if (prev === 9) prev = 8; // skip removed step 9
       if (prev === 4 && !showColonne()) prev = 3;
       if (prev === 6 && (!choices[3] || choices[3] === 'aucun')) prev = 5;
-      if (prev === 1) prev = 2; // skip removed step 1
+      if (prev === 1) prev = 2;
       showStep(prev);
     }
 
@@ -822,6 +903,7 @@
 
       document.getElementById('recap-recueillement').textContent = l(choices[7]);
       document.getElementById('recap-caveau').textContent = l(choices[8]);
+      document.getElementById('recap-granit').textContent = l(choices[10]);
     }
 
     // ==================== SAVE CONFIG & NAVIGATE ====================
@@ -838,6 +920,7 @@
         bancGauche: choices[6],
         recueillement: choices[7],
         caveau: choices[8],
+        granit: choices[10],
         labels: labels
       };
       localStorage.setItem('icollectivites_config', JSON.stringify(config));
@@ -865,8 +948,9 @@
           if (config.bancGauche) { select(6, config.bancGauche); }
           if (config.recueillement) { select(7, config.recueillement); }
           if (config.caveau) { select(8, config.caveau); }
+          if (config.granit) { select(10, config.granit); }
           // Return to recap if all steps were completed
-          if (config.caveau) {
+          if (config.granit) {
             buildRecap();
             showStep(TOTAL);
             return;

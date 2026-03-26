@@ -205,6 +205,41 @@ body {
   box-shadow: 0 0 0 1px var(--primary);
 }
 
+/* --- Options grille 3 colonnes (granit, portes) --- */
+.options.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.options.grid-3 .option-card {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 8px;
+  gap: 8px;
+}
+
+.options.grid-3 .opt-radio { display: none; }
+
+.options.grid-3 .option-card.selected {
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+/* Pastille couleur pour granit/portes */
+.color-swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+
+.option-card.selected .color-swatch {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
 /* --- Condition note --- */
 .condition-note {
   background: rgba(255,149,0,0.08);

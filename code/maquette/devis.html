@@ -478,6 +478,10 @@
         items.push({ label: 'Caveau', value: l(config.caveau) });
       }
 
+      if (config.granit) {
+        items.push({ label: 'Granit corps', value: l(config.granit) });
+      }
+
       grid.innerHTML = items.map(function(item) {
         return '<div class="recap-item">' +
           '<span class="recap-label">' + item.label + '</span>' +
