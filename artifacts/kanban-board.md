@@ -1,9 +1,9 @@
 # Kanban Board - CIMTEA iCollectivites
 
 **Projet** : 016-CIMTEA configurateur
-**Sprint** : Sprint #2
-**Sprint Goal** : Completer la personnalisation (granit, portes) et le cycle devis complet (formulaire enrichi + envoi simule)
-**Derniere mise a jour** : 26/03/2026
+**Sprint** : Sprint #3
+**Sprint Goal** : Intégrer le rendu 3D Lumiscaphe WebRender dans le configurateur
+**Derniere mise a jour** : 28/03/2026
 
 ---
 
@@ -28,6 +28,16 @@
 ## Testing
 
 (vide)
+
+---
+
+## Done (Sprint #3)
+
+| US | Titre | SP | Validation |
+|---|---|---|---|
+| US-008 | Lumiscaphe WebRender 3D | 8 | Stakeholder validé 28/03/2026 |
+
+**SP livrés Sprint #3** : 8/8 SP (100%)
 
 ---
 
@@ -56,38 +66,41 @@
 
 ---
 
+## Sprint #3 — Livrables
+
+**US-008 — Intégration Lumiscaphe WebRender 3D**
+
+Modifications :
+- `code/maquette/configurateur.html` — Viewer @lumiscaphe/viewer v4.1.17 intégré
+  - Mode vrObject 360° (rotation souris infinie, 24 frames)
+  - Mode image pour caméras Face/Top/Côté
+  - Patch fetch pour adapter payload viewer → serveur WebRender
+  - 13 paramètres 3D mappés (granits, portes, modules, bancs, idealo)
+  - Granits renommés (Branco Carrara, Kinawa Classico, Tarn Moyen, Noir Absoluto)
+  - Portes : 4 valeurs WebRender (Balmoral, LabradorVert, NoirAbsoluto, TarnMoyen)
+  - Step Colonne supprimée (pas dans la 3D)
+  - Step Caveau supprimée du configurateur (déplacée dans devis)
+  - Toolbar : boutons 360, Face, Top, Côté + AR(disabled)
+- `code/maquette/devis.html` — Section Caveau enterré ajoutée (4 options)
+
+ADRs :
+- ADR-005 appliquée : Lumiscaphe WebRender (pas Three.js)
+
+---
+
 ## ADRs crees ce sprint
 
-- **ADR-001** : Structure multi-pages HTML avec CSS partage
-- **ADR-002** : Disposition geree par le catalogue, pas le configurateur
-- **ADR-003** : Topbar de navigation commune a tous les ecrans
-- **ADR-004** : Barre d'etapes de configuration sous la topbar
+- **ADR-005** : Lumiscaphe WebRender au lieu de Three.js (appliquée)
 
 ---
 
-## Sprint #1 — Livrables
-
-**Fichiers crees/modifies** :
-- `code/maquette/index.html` — Ecran 1 : selection besoin (4 cards)
-- `code/maquette/catalogue.html` — Ecran 2 : catalogue 20 gammes, 2 niveaux, recherche
-- `code/maquette/configurateur.html` — Ecran 3 : refactorise (topbar, stepbar, disposition auto, restauration config)
-- `code/maquette/devis.html` — Ecran 4 : formulaire devis + photo AR placeholder
-- `code/maquette/styles.css` — CSS commun (topbar, composants)
-- `docs/decisions/ADR-001 a 004`
-
----
-
-## Backlog (Sprint #2 a planifier)
+## Backlog (Sprint #4+)
 
 | US | Titre | SP | Epic |
 |---|---|---|---|
-| US-006 | Choix granit | 3 | EPIC-04 |
-| US-007 | Choix portes (5 matieres) | 3 | EPIC-04 |
-| US-008 | Three.js rendu 3D temps reel | 8 | EPIC-04 |
-| US-009 | Photo sur site + placement AR | 8 | EPIC-04 |
-| US-010 | Logique metier et contraintes | 5 | EPIC-07 |
-| US-012 | Generation dossier devis PDF | 8 | EPIC-05 |
-| US-013 | Envoi devis par email | 3 | EPIC-06 |
+| US-012 | Génération dossier devis simulé | 5 | EPIC-05 |
+| US-009 | Photo sur site + AR | 8 | EPIC-04 |
+| US-010 | Logique métier et contraintes | 5 | EPIC-07 |
 
 ---
 
@@ -105,8 +118,9 @@
 
 ## Statistiques
 
-**Sprints completes** : 2 (Sprint #0 + Sprint #1)
-**Story Points livres total** : 21 SP
-**User Stories completees total** : 6
-**Backlog restant** : 7 US / 38 SP
-**Velocity** : Sprint #0 = 11 SP, Sprint #1 = 10 SP (moyenne 10.5 SP)
+**Sprints completes** : 3 (Sprint #0 + Sprint #1 + Sprint #2)
+**Story Points livres total** : 31 SP
+**User Stories completees total** : 10
+**Sprint #3 en cours** : 8 SP (US-008 en testing)
+**Backlog restant** : 3 US / 18 SP
+**Velocity** : Sprint #0 = 11 SP, Sprint #1 = 10 SP, Sprint #2 = 10 SP (moyenne 10.3 SP)

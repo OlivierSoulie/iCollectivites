@@ -98,9 +98,10 @@ Suivre le workflow Scrumban :
 - **Sprint #0 (Cadrage)** : 11 SP livrés, 3 US Done
 - **Sprint #1 (Parcours)** : 10 SP livrés, 3 US Done
 - **Sprint #2 (Personnalisation + Devis)** : 10 SP livrés, 4 US Done
-- **Velocity** : 10.3 SP/sprint
-- **Backlog restant** : 4 US / 26 SP
-- **Total projet** : 14 US / 57 SP (10 Done, 4 To Do)
+- **Sprint #3 (WebRender 3D)** : 8 SP livrés, 1 US Done
+- **Velocity** : 9.75 SP/sprint
+- **Backlog restant** : 3 US / 18 SP
+- **Total projet** : 14 US / 57 SP (11 Done, 3 To Do)
 
 ---
 

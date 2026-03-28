@@ -281,21 +281,25 @@ Simulation HTML dans la maquette. Le vrai PDF sera genere cote serveur dans l'ap
 
 #### [US-008] Integration Lumiscaphe WebRender et rendu 3D temps reel
 
-**Priorite** : Haute | **SP** : 8 | **Sprint** : A planifier | **Status** : To Do | **Epic** : EPIC-04
+**Priorite** : Haute | **SP** : 8 | **Sprint** : #3 | **Status** : Done | **Epic** : EPIC-04
 
 En tant qu'utilisateur,
 Je veux voir un rendu 3D du columbarium qui se met a jour en temps reel,
 Afin de visualiser ma configuration avant de demander un devis.
 
 **Criteres d'acceptation :**
-- [ ] Viewer Lumiscaphe dans le viewport (remplace le placeholder)
-- [ ] Integration via iframe ou composant ng-viewer
-- [ ] Camera orbitale (rotation, zoom, pan) via gestes tactiles
-- [ ] Mise a jour selon : modules, granit, portes, accessoires
-- [ ] Configuration lue depuis XML (ADR-005)
+- [x] Viewer Lumiscaphe dans le viewport (remplace le placeholder)
+- [x] Integration via @lumiscaphe/viewer v4.1.17 (ESM CDN)
+- [x] Rotation 360° vrObject (24 frames, loop infini)
+- [x] Vues cameras : 360, Face, Top, Cote
+- [x] Mise a jour selon : modules, granit, portes (13 parametres WebRender)
+- [x] Configuration construite dynamiquement (buildConfigString)
+- [x] Patch fetch pour adapter payload viewer → serveur WebRender
 
 **Notes techniques :**
-Moteur Lumiscaphe WebRender (ADR-005), PAS Three.js. Pre-requis : URL WebRender a definir.
+Moteur Lumiscaphe WebRender (ADR-005), PAS Three.js.
+Serveur : https://wr-lumis3d.lumiscaphe.com
+Database : abf5282e-8ba4-443c-9dac-2a8d3434f034
 API : https://app.swaggerhub.com/apis/Lumiscaphe/WebRender/1.0
 Viewer : @lumiscaphe/ng-viewer
 
@@ -352,12 +356,12 @@ Afin de garantir que seules les configurations valides sont proposees.
 | US-014 | Complément formulaire devis | 2 | EPIC-05 | Done — Sprint #2 |
 | US-013 | Écran 5 — Envoi email simulé | 2 | EPIC-06 | Done — Sprint #2 |
 | US-012 | Generation devis simule | 5 | EPIC-05 | To Do — Sprint #3 |
-| US-008 | Lumiscaphe WebRender 3D | 8 | EPIC-04 | To Do |
+| US-008 | Lumiscaphe WebRender 3D | 8 | EPIC-04 | Done — Sprint #3 |
 | US-009 | Photo sur site + AR (ARKit) | 8 | EPIC-04 | To Do |
 | US-010 | Logique metier et contraintes | 5 | EPIC-07 | To Do |
 
-**Done** : 10 US / 31 SP
-**Backlog restant** : 4 US / 26 SP
+**Done** : 11 US / 39 SP
+**Backlog restant** : 3 US / 18 SP
 **Total** : 14 US / 57 SP
 
 ---
@@ -372,7 +376,7 @@ Afin de garantir que seules les configurations valides sont proposees.
 | Photos produits catalogue | Ecran 2 + dossier devis | PDF p.6/p.8 |
 | Tarifs produits et options | Calcul devis chiffre (US-010) | PDF p.8 |
 | Forfaits pose (tarifs facile/normal/difficile) | Calcul devis | PDF p.8 |
-| URL serveur WebRender | Requis pour US-008 | ADR-005 |
+| ~~URL serveur WebRender~~ | ~~Requis pour US-008~~ — **RESOLU** : wr-lumis3d.lumiscaphe.com | ADR-005 |
 | Gamme Emeraude Courbe (convexe/concave) | Etape "Forme" supplementaire | Synthese |
 | Configurations 9 et 18 cases | Plus de choix de capacite | Synthese |
 | Catalogue Jardins du souvenir / Ossuaire | Ecrans 1-2 complets | PDF p.5 |

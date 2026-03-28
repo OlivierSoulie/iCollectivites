@@ -361,6 +361,27 @@
     </div>
 
     <div class="form-card">
+      <h4>Caveau enterré</h4>
+      <div class="form-group">
+        <label>Type de caveau</label>
+        <div class="radio-group">
+          <div class="radio-option selected" onclick="selectCaveau('aucun')" id="caveau-aucun">
+            <span class="radio-dot"></span><span>Aucun</span>
+          </div>
+          <div class="radio-option" onclick="selectCaveau('simple-fond')" id="caveau-simple-fond">
+            <span class="radio-dot"></span><span>Simple 27 cm avec fond</span>
+          </div>
+          <div class="radio-option" onclick="selectCaveau('simple-sans')" id="caveau-simple-sans">
+            <span class="radio-dot"></span><span>Simple 27 cm sans fond</span>
+          </div>
+          <div class="radio-option" onclick="selectCaveau('double')" id="caveau-double">
+            <span class="radio-dot"></span><span>Double 54 cm</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
       <h4>Client</h4>
 
       <div class="form-group">
@@ -567,14 +588,24 @@
     }
 
     let selectedForfait = 'facile';
+    let selectedCaveau = 'aucun';
 
     /** Select a forfait de pose option */
     function selectForfait(type) {
-      document.querySelectorAll('.radio-option').forEach(function(el) {
+      document.querySelectorAll('#forfait-facile, #forfait-normal, #forfait-difficile').forEach(function(el) {
         el.classList.remove('selected');
       });
       document.getElementById('forfait-' + type).classList.add('selected');
       selectedForfait = type;
+    }
+
+    /** Select a caveau option */
+    function selectCaveau(type) {
+      document.querySelectorAll('#caveau-aucun, #caveau-simple-fond, #caveau-simple-sans, #caveau-double').forEach(function(el) {
+        el.classList.remove('selected');
+      });
+      document.getElementById('caveau-' + type).classList.add('selected');
+      selectedCaveau = type;
     }
 
     // ==================== EMAIL VALIDATION (US-014) ====================
@@ -611,7 +642,8 @@
         reference: document.getElementById('inputReference').value.trim(),
         commentaires: document.getElementById('inputCommentaires').value.trim(),
         remise: document.getElementById('inputRemise').value,
-        forfait: selectedForfait
+        forfait: selectedForfait,
+        caveau: selectedCaveau
       };
       localStorage.setItem('icollectivites_devis', JSON.stringify(data));
       return data;
@@ -634,6 +666,7 @@
         if (data.commentaires) document.getElementById('inputCommentaires').value = data.commentaires;
         if (data.remise) document.getElementById('inputRemise').value = data.remise;
         if (data.forfait) selectForfait(data.forfait);
+        if (data.caveau) selectCaveau(data.caveau);
       } catch (e) { /* ignore */ }
     }
 

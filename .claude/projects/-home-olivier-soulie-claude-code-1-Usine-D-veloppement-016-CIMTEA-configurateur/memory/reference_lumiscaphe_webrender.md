@@ -6,17 +6,23 @@ type: reference
 
 Le rendu 3D utilise l'API Lumiscaphe WebRender, PAS Three.js.
 
-**API WebRender** : https://app.swaggerhub.com/apis/Lumiscaphe/WebRender/1.0
-**Viewer NPM** : https://www.npmjs.com/package/@lumiscaphe/ng-viewer
-**Regle** : Toujours utiliser les curl pour parser ces documents API.
+**Serveur** : https://wr-lumis3d.lumiscaphe.com
+**API Swagger** : https://app.swaggerhub.com/apis/Lumiscaphe/WebRender/1.0 (necessite auth SwaggerHub, mais accessible via `curl -s https://api.swaggerhub.com/apis/Lumiscaphe/WebRender/1.0 -H "Accept: application/json"`)
 
-**Configuration XML** :
-- Les donnees de configuration sont dans des fichiers XML
-- Valeurs de configuration (noms de schemas, couleurs, etc.)
-- Parametres de positionnement
-- Groupes de cameras
-- **Regle** : Toujours utiliser les valeurs du XML, jamais les hardcoder.
+**Endpoints principaux** :
+- `GET /Database?databaseId=GUID` — retourne XML complet (produits, cameras, config, materiaux)
+- `POST /Snapshot` — rendu image, retourne JSON avec URL vers /Resource
+- `GET /ImageFromBookmark` — rendu par bookmark camera
+- `POST /Pick` — picking 3D
+- `POST /Hotspot` — hotspots interactifs
 
-**AR simulee** : fond photo dans le viewer WebRender (pas de vrai AR natif).
+**Viewer NPM** : @lumiscaphe/ng-viewer (Angular, utilisable en iframe)
+- Props : `server`, `scene` (database + configuration string), `view` (mode + camera)
+- Configuration = string slash-separee : `Param.Value/Param.Value/...`
+
+**Regles** :
+- Toujours lire les valeurs depuis /Database, jamais hardcoder
+- Pas d'authentification requise
+- Endpoints a la racine (pas de /api/v1/)
 
 **Contexte** : Olivier travaille chez Lumiscaphe, c'est leur moteur interne.
