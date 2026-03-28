@@ -149,6 +149,21 @@
     }
 
     .vp-btn:active { background: rgba(30,30,34,0.9); }
+
+    .viewport-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: rgba(0,0,0,0.35);
+      font-size: 18px;
+      font-weight: 500;
+      padding: 40px;
+      pointer-events: none;
+      z-index: 3;
+    }
     .vp-btn.active { background: rgba(0,122,255,0.85); border-color: rgba(0,122,255,0.9); color: white; }
 
     /* ============================================
@@ -268,6 +283,7 @@
   <div class="viewport">
     <div id="viewport3d"></div>
     <div class="viewport-loading" id="viewportLoading">Chargement du rendu 3D…</div>
+    <div class="viewport-hint" id="viewportHint">Configurez votre columbarium en choisissant les éléments dans le panneau de droite</div>
 
     <!-- Toolbar caméras -->
     <div class="viewport-toolbar">
@@ -791,6 +807,15 @@
         database: WR_DATABASE_ID,
         configuration: configString
       }]);
+      // Masquer le hint dès qu'un élément est configuré
+      var hint = document.getElementById('viewportHint');
+      if (hint) {
+        var hasConfig = (choices[2] && choices[2] !== 'aucun') ||
+                        (choices[3] && choices[3] !== 'aucun') ||
+                        (choices[5] && choices[5] !== 'aucun') ||
+                        (choices[6] && choices[6] !== 'aucun');
+        hint.style.display = hasConfig ? 'none' : 'flex';
+      }
     }
 
     /** Set camera view */
