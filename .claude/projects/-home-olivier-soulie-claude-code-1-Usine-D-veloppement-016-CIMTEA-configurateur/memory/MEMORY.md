@@ -11,3 +11,4 @@
 - [project_caveaux.md](project_caveaux.md) — option enterrée, devis uniquement, pas de WebRender/AR
 - [reference_viewer_vrObject_config.md](reference_viewer_vrObject_config.md) — Config viewer vrObject : mode minuscule, loop, patch fetch, GUIDs caméras
 - [feedback_no_reinvent_wheel.md](feedback_no_reinvent_wheel.md) — Ne jamais recoder un viewer custom, adapter la config des libs existantes
+- [project_webgl_next.md](project_webgl_next.md) — Priorité : vrai WebGL (pas vrObject) + modèle Émeraude Angle (en L) à intégrer
