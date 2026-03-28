@@ -118,9 +118,9 @@ ADRs :
 
 ## Statistiques
 
-**Sprints completes** : 3 (Sprint #0 + Sprint #1 + Sprint #2)
-**Story Points livres total** : 31 SP
-**User Stories completees total** : 10
-**Sprint #3 en cours** : 8 SP (US-008 en testing)
+**Sprints completes** : 4 (Sprint #0 + Sprint #1 + Sprint #2 + Sprint #3)
+**Story Points livres total** : 39 SP
+**User Stories completees total** : 11
+**Sprint #3** : 8 SP livrés (US-008 Done)
 **Backlog restant** : 3 US / 18 SP
-**Velocity** : Sprint #0 = 11 SP, Sprint #1 = 10 SP, Sprint #2 = 10 SP (moyenne 10.3 SP)
+**Velocity** : Sprint #0 = 11 SP, Sprint #1 = 10 SP, Sprint #2 = 10 SP, Sprint #3 = 8 SP (moyenne 9.75 SP)
