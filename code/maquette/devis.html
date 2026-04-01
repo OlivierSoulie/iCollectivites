@@ -44,35 +44,6 @@
       opacity: 0.5;
     }
 
-    .photo-placeholder .ph-hint {
-      font-size: 13px;
-      opacity: 0.3;
-      margin-top: 8px;
-    }
-
-    .photo-toolbar {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      display: flex;
-      gap: 8px;
-    }
-
-    .photo-toolbar .vp-btn {
-      width: 44px; height: 44px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: rgba(255,255,255,0.7);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: not-allowed;
-      opacity: 0.35;
-    }
-
     /* --- Sidebar formulaire (droite) --- */
     .devis-sidebar {
       width: var(--sidebar-width);
@@ -96,46 +67,6 @@
     }
 
     .devis-scroll::-webkit-scrollbar { display: none; }
-
-    /* --- Recap config (lecture seule) --- */
-    .config-recap {
-      background: var(--bg);
-      border-radius: var(--radius-sm);
-      padding: 14px 16px;
-      margin-bottom: 16px;
-    }
-
-    .config-recap h3 {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
-    }
-
-    .config-recap .recap-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 4px;
-    }
-
-    .config-recap .recap-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 0;
-    }
-
-    .config-recap .recap-label {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    .config-recap .recap-value {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-    }
 
     /* --- Section titre --- */
     .section-heading {
@@ -451,22 +382,18 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
+  <script src="shared.js"></script>
   <script>
     // ==================== CONFIG FROM LOCALSTORAGE (T2) ====================
 
-    /** Load configuration from localStorage */
-    function loadConfig() {
-      const raw = localStorage.getItem('icollectivites_config');
-      if (!raw) {
+    /** Load configuration — redirige si absente */
+    function loadConfigOrRedirect() {
+      const config = loadConfig();
+      if (!config) {
         window.location.href = 'index.html';
         return null;
       }
-      try {
-        return JSON.parse(raw);
-      } catch (e) {
-        window.location.href = 'index.html';
-        return null;
-      }
+      return config;
     }
 
 
@@ -543,7 +470,7 @@
     /** Validate email format */
     function validateEmail(input) {
       const email = input.value.trim();
-      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (email && !isValidEmail(email)) {
         input.classList.add('invalid');
       } else {
         input.classList.remove('invalid');
@@ -597,7 +524,7 @@
         if (data.remise) document.getElementById('inputRemise').value = data.remise;
         if (data.forfait) selectForfait(data.forfait);
         if (data.provenance) selectProvenance(data.provenance);
-      } catch (e) { /* ignore */ }
+      } catch (e) { console.error('Erreur restauration devis:', e); }
     }
 
     /** Validate and navigate to envoi page */
@@ -611,7 +538,7 @@
       }
 
       const email = document.getElementById('inputEmail').value.trim();
-      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (!email || !isValidEmail(email)) {
         document.getElementById('inputEmail').classList.add('invalid');
         document.getElementById('inputEmail').focus();
         showToast('Veuillez renseigner un email valide');
@@ -644,44 +571,9 @@
 
     // ==================== INIT ====================
 
-    const WR_SERVER = 'https://wr-lumis3d.lumiscaphe.com';
-    const WR_DATABASE_ID = 'b426509a-077a-4c94-b28f-06cb67d553fa';
-    const WR_DEFAULT_CAMERA = '8c01be9c-8496-4bc6-90fc-5e2eecbf4411';
-
-    /** Charge l'image 0 du monument depuis WebRender Snapshot */
-    function loadMonumentImage(config) {
-      if (!config || !config.wrConfigString) return;
-      var payload = {
-        scene: [{ database: WR_DATABASE_ID, configuration: config.wrConfigString }],
-        mode: { vrObject: { camera: WR_DEFAULT_CAMERA, frames: 1 } },
-        renderParameters: { width: 1024, height: 768, antialiasing: false, superSampling: '2' },
-        encoder: { jpeg: { quality: 85 } }
-      };
-      fetch(WR_SERVER + '/Snapshot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data && data.url) {
-          var img = document.getElementById('monumentImage');
-          img.src = data.url.startsWith('http') ? data.url : WR_SERVER + data.url;
-          img.onload = function() {
-            img.style.display = 'block';
-            document.getElementById('monumentPlaceholder').style.display = 'none';
-          };
-        }
-      })
-      .catch(function(e) {
-        console.error('Snapshot WebRender échoué:', e);
-        document.querySelector('#monumentPlaceholder .ph-text').textContent = 'Rendu 3D indisponible';
-      });
-    }
-
-    const config = loadConfig();
+    const config = loadConfigOrRedirect();
     updateTopbar(config);
-    loadMonumentImage(config);
+    loadMonumentImage(config, 'monumentImage', 'monumentPlaceholder', '#monumentPlaceholder .ph-text');
     restoreDevisData();
 
     // Synchroniser la provenance depuis le configurateur si pas déjà dans devis

@@ -208,24 +208,17 @@
     CIMTEA &mdash; Créateur de columbariums depuis 1995
   </div>
 
+  <script src="shared.js"></script>
   <script>
-    /** Clear all saved configuration data */
-    function clearConfig() {
-      localStorage.removeItem('icollectivites_config');
-      localStorage.removeItem('icollectivites_devis');
-      localStorage.removeItem('icollectivites_besoin');
-      localStorage.removeItem('icollectivites_produit');
-    }
-
     /** Navigate to catalogue page with selected need type */
     function selectBesoin(type) {
-      clearConfig();
+      clearAllData();
       localStorage.setItem('icollectivites_besoin', type);
       window.location.href = 'catalogue.html?besoin=' + encodeURIComponent(type);
     }
 
     // Clear config on page load (retour accueil = RAZ)
-    clearConfig();
+    clearAllData();
   </script>
 
 </body>

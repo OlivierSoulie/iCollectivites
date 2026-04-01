@@ -390,20 +390,8 @@
     </div>
   </div>
 
+  <script src="shared.js"></script>
   <script>
-    // ==================== LOAD DATA ====================
-
-    /** Load config from localStorage */
-    function loadConfig() {
-      try { return JSON.parse(localStorage.getItem('icollectivites_config')); }
-      catch (e) { return null; }
-    }
-
-    /** Load devis data from localStorage */
-    function loadDevis() {
-      try { return JSON.parse(localStorage.getItem('icollectivites_devis')); }
-      catch (e) { return null; }
-    }
 
     // ==================== RENDER RECAP ====================
 
@@ -517,10 +505,7 @@
 
     /** Start a new project — clear localStorage and go to index */
     function newProject() {
-      localStorage.removeItem('icollectivites_config');
-      localStorage.removeItem('icollectivites_devis');
-      localStorage.removeItem('icollectivites_besoin');
-      localStorage.removeItem('icollectivites_produit');
+      clearAllData();
       window.location.href = 'index.html';
     }
 
@@ -529,41 +514,6 @@
     /** Go back to devis page */
     function goBack() {
       window.location.href = 'devis.html';
-    }
-
-    // ==================== WEBRENDER SNAPSHOT ====================
-    const WR_SERVER = 'https://wr-lumis3d.lumiscaphe.com';
-    const WR_DATABASE_ID = 'b426509a-077a-4c94-b28f-06cb67d553fa';
-    const WR_DEFAULT_CAMERA = '8c01be9c-8496-4bc6-90fc-5e2eecbf4411';
-
-    function loadMonumentImage(config) {
-      if (!config || !config.wrConfigString) return;
-      var payload = {
-        scene: [{ database: WR_DATABASE_ID, configuration: config.wrConfigString }],
-        mode: { vrObject: { camera: WR_DEFAULT_CAMERA, frames: 1 } },
-        renderParameters: { width: 1024, height: 768, antialiasing: false, superSampling: '2' },
-        encoder: { jpeg: { quality: 85 } }
-      };
-      fetch(WR_SERVER + '/Snapshot', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data && data.url) {
-          var img = document.getElementById('monumentImage');
-          img.src = data.url.startsWith('http') ? data.url : WR_SERVER + data.url;
-          img.onload = function() {
-            img.style.display = 'block';
-            document.getElementById('monumentPlaceholder').style.display = 'none';
-          };
-        }
-      })
-      .catch(function(e) {
-        console.error('Snapshot WebRender échoué:', e);
-        document.querySelector('#monumentPlaceholder .pi-text').textContent = 'Rendu 3D indisponible';
-      });
     }
 
     // ==================== INIT ====================
@@ -578,10 +528,10 @@
     // Render recaps
     renderConfigRecap(config);
     renderInfosRecap(devis);
-    loadMonumentImage(config);
+    loadMonumentImage(config, 'monumentImage', 'monumentPlaceholder', '#monumentPlaceholder .pi-text');
 
     // Set project name in title and subtitle
-    var projectName = devis.nomProjet || '—';
+    const projectName = devis.nomProjet || '—';
     document.getElementById('recapTitle').textContent = projectName;
     document.getElementById('recapProjectName').textContent = 'Commune de ' + (devis.commune || '—');
 

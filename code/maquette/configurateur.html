@@ -710,106 +710,78 @@
       updateViewer();
     }
 
-    // ==================== GRANIT PICKERS (inline per element) ====================
+    // ==================== SWATCH PICKERS (générique DRY) ====================
 
-    /** Build granit picker HTML for a step */
-    function buildGranitPickerHTML(step) {
-      let html = '<h4>Granit</h4><div class="granit-swatches">';
-      GRANITS.forEach(function(g) {
-        const sel = granitChoices[step] === g.id ? ' selected' : '';
+    /**
+     * Build swatch picker HTML (générique pour granit, portes, carreaux)
+     * @param {string} title — Titre affiché (ex: "Granit", "Matière des portes")
+     * @param {Array} items — Tableau [{id, nom, color}]
+     * @param {string} selectedId — ID sélectionné actuellement
+     * @param {string} onclickFn — Nom de la fonction onclick (ex: "selectGranit")
+     * @param {number|null} step — Numéro d'étape (null pour carreaux)
+     */
+    function buildSwatchPickerHTML(title, items, selectedId, onclickFn, step) {
+      let html = '<h4>' + title + '</h4><div class="granit-swatches">';
+      items.forEach(function(item) {
+        const sel = selectedId === item.id ? ' selected' : '';
+        const onclick = step !== null
+          ? onclickFn + '(' + step + ',\'' + item.id + '\')'
+          : onclickFn + '(\'' + item.id + '\')';
         html += '<div class="granit-swatch-item">' +
-          '<div class="granit-swatch' + sel + '" style="background:' + g.color + '" ' +
-          'onclick="selectGranit(' + step + ',\'' + g.id + '\')" title="' + g.nom + '"></div>' +
-          '<span class="granit-swatch-label">' + g.nom + '</span></div>';
+          '<div class="granit-swatch' + sel + '" style="background:' + item.color + '" ' +
+          'onclick="' + onclick + '" title="' + item.nom + '"></div>' +
+          '<span class="granit-swatch-label">' + item.nom + '</span></div>';
       });
       html += '</div>';
       return html;
     }
 
-    /** Render all granit pickers */
+    /** Sélection générique d'un swatch dans un conteneur */
+    function selectSwatch(containerId, items, value) {
+      const container = document.getElementById(containerId);
+      container.querySelectorAll('.granit-swatch').forEach(function(s) { s.classList.remove('selected'); });
+      const swatches = container.querySelectorAll('.granit-swatch');
+      const idx = items.findIndex(function(item) { return item.id === value; });
+      if (idx >= 0 && swatches[idx]) swatches[idx].classList.add('selected');
+    }
+
+    // --- Granit ---
     function renderGranitPickers() {
       STEPS_WITH_GRANIT.forEach(function(step) {
-        var el = document.getElementById('granit-picker-' + step);
-        if (el) el.innerHTML = buildGranitPickerHTML(step);
+        const el = document.getElementById('granit-picker-' + step);
+        if (el) el.innerHTML = buildSwatchPickerHTML('Granit', GRANITS, granitChoices[step], 'selectGranit', step);
       });
     }
 
-    /** Select a granit for a specific step */
     function selectGranit(step, value) {
       granitChoices[step] = value;
-      var container = document.getElementById('granit-picker-' + step);
-      container.querySelectorAll('.granit-swatch').forEach(function(s) { s.classList.remove('selected'); });
-      var swatches = container.querySelectorAll('.granit-swatch');
-      var idx = GRANITS.findIndex(function(g) { return g.id === value; });
-      if (idx >= 0 && swatches[idx]) swatches[idx].classList.add('selected');
+      selectSwatch('granit-picker-' + step, GRANITS, value);
       updateViewer();
     }
 
-    // ==================== PORTES PICKERS (inline per module) ====================
-
-    /** Build portes picker HTML for a step */
-    function buildPortesPickerHTML(step) {
-      let html = '<h4>Matière des portes</h4><div class="granit-swatches">';
-      PORTES.forEach(function(p) {
-        const sel = portesChoices[step] === p.id ? ' selected' : '';
-        html += '<div class="granit-swatch-item">' +
-          '<div class="granit-swatch' + sel + '" style="background:' + p.color + '" ' +
-          'onclick="selectPortes(' + step + ',\'' + p.id + '\')" title="' + p.nom + '"></div>' +
-          '<span class="granit-swatch-label">' + p.nom + '</span></div>';
-      });
-      html += '</div>';
-      return html;
-    }
-
-    /** Render portes pickers in module steps */
+    // --- Portes ---
     function renderPortesPickers() {
       STEPS_WITH_PORTES.forEach(function(step) {
-        var el = document.getElementById('portes-picker-' + step);
-        if (el) el.innerHTML = buildPortesPickerHTML(step);
+        const el = document.getElementById('portes-picker-' + step);
+        if (el) el.innerHTML = buildSwatchPickerHTML('Matière des portes', PORTES, portesChoices[step], 'selectPortes', step);
       });
     }
 
-    /** Select a portes material for a specific step */
     function selectPortes(step, value) {
       portesChoices[step] = value;
-      var container = document.getElementById('portes-picker-' + step);
-      container.querySelectorAll('.granit-swatch').forEach(function(s) { s.classList.remove('selected'); });
-      var swatches = container.querySelectorAll('.granit-swatch');
-      var idx = PORTES.findIndex(function(p) { return p.id === value; });
-      if (idx >= 0 && swatches[idx]) swatches[idx].classList.add('selected');
+      selectSwatch('portes-picker-' + step, PORTES, value);
       updateViewer();
     }
 
-    // ==================== CARREAUX PICKER (step 7) ====================
-
-    /** Build carreaux picker HTML */
-    function buildCarreauxPickerHTML() {
-      let html = '<h4>Carreaux (sol)</h4><div class="granit-swatches">';
-      CARREAUX.forEach(function(c) {
-        const sel = carreauxChoice === c.id ? ' selected' : '';
-        html += '<div class="granit-swatch-item">' +
-          '<div class="granit-swatch' + sel + '" style="background:' + c.color + '" ' +
-          'onclick="selectCarreaux(\'' + c.id + '\')" title="' + c.nom + '"></div>' +
-          '<span class="granit-swatch-label">' + c.nom + '</span></div>';
-      });
-      html += '</div>';
-      return html;
-    }
-
-    /** Render carreaux picker in step 7 */
+    // --- Carreaux ---
     function renderCarreauxPicker() {
-      var el = document.getElementById('carreaux-picker-7');
-      if (el) el.innerHTML = buildCarreauxPickerHTML();
+      const el = document.getElementById('carreaux-picker-7');
+      if (el) el.innerHTML = buildSwatchPickerHTML('Carreaux (sol)', CARREAUX, carreauxChoice, 'selectCarreaux', null);
     }
 
-    /** Select carreaux material */
     function selectCarreaux(value) {
       carreauxChoice = value;
-      var container = document.getElementById('carreaux-picker-7');
-      container.querySelectorAll('.granit-swatch').forEach(function(s) { s.classList.remove('selected'); });
-      var swatches = container.querySelectorAll('.granit-swatch');
-      var idx = CARREAUX.findIndex(function(c) { return c.id === value; });
-      if (idx >= 0 && swatches[idx]) swatches[idx].classList.add('selected');
+      selectSwatch('carreaux-picker-7', CARREAUX, value);
       updateViewer();
     }
 
@@ -889,7 +861,7 @@
                 body.mode.vrObject = { camera: WR_CAMERAS[currentCamera], frames: frames };
                 options = Object.assign({}, options, { body: JSON.stringify(body) });
               }
-            } catch (e) {}
+            } catch (e) { console.error('Patch fetch parse error:', e); }
           }
           return originalFetch.call(this, url, options);
         };
@@ -1112,7 +1084,7 @@
           }
           // Restore carreaux choice
           if (config.carreaux) selectCarreaux(config.carreaux);
-        } catch (e) { /* ignore parse errors */ }
+        } catch (e) { console.error('Erreur restauration config:', e); }
       }
 
       showStep(3);
