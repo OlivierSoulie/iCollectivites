@@ -259,7 +259,7 @@ body {
 .granit-swatches {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 13px;
 }
 
 .granit-swatch {
@@ -286,10 +286,9 @@ body {
   color: var(--text-secondary);
   text-align: center;
   margin-top: 2px;
-  width: 36px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  width: 60px;
+  line-height: 1.2;
+  word-wrap: break-word;
 }
 
 .granit-swatch-item {

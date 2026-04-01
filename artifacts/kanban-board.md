@@ -3,7 +3,7 @@
 **Projet** : 016-CIMTEA configurateur
 **Sprint** : Sprint #3
 **Sprint Goal** : Intégrer le rendu 3D Lumiscaphe WebRender dans le configurateur
-**Derniere mise a jour** : 28/03/2026
+**Derniere mise a jour** : 01/04/2026
 
 ---
 
@@ -73,15 +73,29 @@
 Modifications :
 - `code/maquette/configurateur.html` — Viewer @lumiscaphe/viewer v4.1.17 intégré
   - Mode vrObject 360° (rotation souris infinie, 24 frames)
-  - Mode image pour caméras Face/Top/Côté
+  - Mode image pour caméras Top/Côté
   - Patch fetch pour adapter payload viewer → serveur WebRender
-  - 13 paramètres 3D mappés (granits, portes, modules, bancs, idealo)
-  - Granits renommés (Branco Carrara, Kinawa Classico, Tarn Moyen, Noir Absoluto)
-  - Portes : 4 valeurs WebRender (Balmoral, LabradorVert, NoirAbsoluto, TarnMoyen)
+  - 13 paramètres 3D mappés (granits, portes, carreaux, modules, bancs, idealo)
+  - Database ID : `b426509a-077a-4c94-b28f-06cb67d553fa`
+  - Granits simplifiés : 3 coloris (Bleu, Gris, Rose)
+  - Portes : 4 coloris (Gris, Noir, Noir Moucheté, Rose)
+  - Carreaux (sol) : configurable dans step Recueillement (4 coloris)
   - Step Colonne supprimée (pas dans la 3D)
-  - Step Caveau supprimée du configurateur (déplacée dans devis)
-  - Toolbar : boutons 360, Face, Top, Côté + AR(disabled)
-- `code/maquette/devis.html` — Section Caveau enterré ajoutée (4 options)
+  - Ordre des étapes : Module G → Banc G → IDEALO → Module D → Banc D → Récap
+  - Pré-sélection couleurs par défaut (Gris/Noir)
+  - Toolbar : boutons 360, Top, Côté + AR(disabled)
+- `code/maquette/devis.html`
+  - Section Caveau supprimée, remplacée par Provenance granit (France/Import avec drapeaux SVG)
+  - Image 3D WebRender du monument (Snapshot API, frame 0) dans le panneau gauche
+  - Section recap configuration supprimée
+- `code/maquette/envoi.html`
+  - Image 3D WebRender du monument dans l'aperçu projet
+  - Provenance granit avec drapeaux dans le récap infos
+  - Infos compactées : Client+Email sur une ligne, Remise+Forfait+Provenance sur une ligne
+  - Commentaires avec retours à la ligne préservés et ascenseur si > 3 lignes
+  - Layout optimisé : infos en haut, image + config côte à côte en bas
+- `code/maquette/styles.css`
+  - Labels swatches : largeur 60px, noms complets visibles, gap 13px
 
 ADRs :
 - ADR-005 appliquée : Lumiscaphe WebRender (pas Three.js)

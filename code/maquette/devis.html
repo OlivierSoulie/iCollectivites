@@ -331,17 +331,13 @@
     <a class="topbar-logo" href="index.html">CIMTEA</a>
   </nav>
 
-  <!-- Panneau photo AR (gauche) — bouchonne -->
+  <!-- Panneau image 3D du monument (gauche) -->
   <div class="photo-panel">
-    <div class="photo-placeholder">
-      <div class="ph-icon">&#128247;</div>
-      <div class="ph-text">Photo du site</div>
-      <div class="ph-hint">Placement AR du columbarium — bientôt disponible</div>
+    <div class="photo-placeholder" id="monumentPlaceholder">
+      <div class="ph-icon">&#9881;</div>
+      <div class="ph-text">Chargement du rendu 3D…</div>
     </div>
-    <div class="photo-toolbar">
-      <button class="vp-btn" title="Prendre une photo — bientôt disponible" disabled>&#128247;</button>
-      <button class="vp-btn" title="Galerie — bientôt disponible" disabled>AR</button>
-    </div>
+    <img id="monumentImage" src="" alt="Rendu 3D du columbarium" style="display:none;width:100%;height:100%;object-fit:cover;">
   </div>
 
   <!-- Sidebar formulaire (droite) -->
@@ -357,27 +353,6 @@
       <div class="form-group">
         <label>Commune <span class="required">*</span></label>
         <input type="text" class="form-input" id="inputCommune" placeholder="Nom de la commune" oninput="onCommuneChange()">
-      </div>
-    </div>
-
-    <div class="form-card">
-      <h4>Caveau enterré</h4>
-      <div class="form-group">
-        <label>Type de caveau</label>
-        <div class="radio-group">
-          <div class="radio-option selected" onclick="selectCaveau('aucun')" id="caveau-aucun">
-            <span class="radio-dot"></span><span>Aucun</span>
-          </div>
-          <div class="radio-option" onclick="selectCaveau('simple-fond')" id="caveau-simple-fond">
-            <span class="radio-dot"></span><span>Simple 27 cm avec fond</span>
-          </div>
-          <div class="radio-option" onclick="selectCaveau('simple-sans')" id="caveau-simple-sans">
-            <span class="radio-dot"></span><span>Simple 27 cm sans fond</span>
-          </div>
-          <div class="radio-option" onclick="selectCaveau('double')" id="caveau-double">
-            <span class="radio-dot"></span><span>Double 54 cm</span>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -440,6 +415,25 @@
       </div>
     </div>
 
+    <div class="form-card">
+      <h4>Provenance du granit</h4>
+      <div class="form-group">
+        <div class="radio-group">
+          <div class="radio-option selected" onclick="selectProvenance('france')" id="prov-france" style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <h5>France</h5>
+            <svg width="28" height="19" viewBox="0 0 30 20" style="border-radius:3px"><rect width="10" height="20" fill="#002395"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#ED2939"/></svg>
+          </div>
+          <div class="radio-option" onclick="selectProvenance('import')" id="prov-import" style="display:flex;flex-direction:column;align-items:center;gap:6px">
+            <h5>Import</h5>
+            <div style="display:flex;gap:4px">
+              <svg width="22" height="15" viewBox="0 0 30 20" style="border-radius:2px"><rect width="30" height="20" fill="#DE2910"/><polygon points="5,2 6.2,5.5 3,3.7 7,3.7 3.8,5.5" fill="#FFDE00"/></svg>
+              <svg width="22" height="15" viewBox="0 0 30 20" style="border-radius:2px"><rect width="30" height="10" fill="#FF9933"/><rect y="10" width="30" height="10" fill="#138808"/><rect y="7" width="30" height="6" fill="#fff"/><circle cx="15" cy="10" r="3" fill="none" stroke="#000080" stroke-width="0.5"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /devis-scroll -->
 
     <!-- Footer dans la sidebar -->
@@ -475,69 +469,7 @@
       }
     }
 
-    /** Render the config recap at top of page */
-    function renderRecap(config) {
-      if (!config) return;
 
-      const labels = config.labels || {};
-      const l = function(v) { return labels[v] || v || '—'; };
-      const grid = document.getElementById('recapGrid');
-      const items = [];
-
-      items.push({ label: 'Disposition', value: l(config.disposition) });
-      items.push({ label: 'Module droit', value: l(config.moduleDroit) });
-
-      if (config.moduleGauche && config.moduleGauche !== 'aucun') {
-        items.push({ label: 'Module gauche', value: l(config.moduleGauche) });
-      }
-
-      if (config.colonne && config.colonne !== 'non') {
-        items.push({ label: 'Colonne', value: l(config.colonne) });
-      }
-
-      if (config.bancDroit && config.bancDroit !== 'aucun') {
-        items.push({ label: 'Banc droit', value: l(config.bancDroit) });
-      }
-
-      if (config.bancGauche && config.bancGauche !== 'aucun') {
-        items.push({ label: 'Banc gauche', value: l(config.bancGauche) });
-      }
-
-      if (config.recueillement && config.recueillement !== 'aucun') {
-        items.push({ label: 'Recueillement', value: l(config.recueillement) });
-      }
-
-      if (config.caveau && config.caveau !== 'aucun') {
-        items.push({ label: 'Caveau', value: l(config.caveau) });
-      }
-
-      // Granits par element
-      if (config.granits) {
-        var gLabels = { 2: 'Module droit', 3: 'Module gauche', 4: 'Colonne', 5: 'Banc droit', 6: 'Banc gauche', 7: 'Recueillement' };
-        [2, 3, 4, 5, 6, 7].forEach(function(s) {
-          if (config.granits[s]) {
-            items.push({ label: 'Granit ' + gLabels[s], value: l(config.granits[s]) });
-          }
-        });
-      }
-
-      // Portes par module
-      if (config.portes && typeof config.portes === 'object') {
-        var pLabels = { 2: 'Module droit', 3: 'Module gauche' };
-        [2, 3].forEach(function(s) {
-          if (config.portes[s]) {
-            items.push({ label: 'Portes ' + pLabels[s], value: l(config.portes[s]) });
-          }
-        });
-      }
-
-      grid.innerHTML = items.map(function(item) {
-        return '<div class="recap-item">' +
-          '<span class="recap-label">' + item.label + '</span>' +
-          '<span class="recap-value">' + item.value + '</span>' +
-          '</div>';
-      }).join('');
-    }
 
     /** Update topbar breadcrumb with product name */
     function updateTopbar(config) {
@@ -588,7 +520,7 @@
     }
 
     let selectedForfait = 'facile';
-    let selectedCaveau = 'aucun';
+    let selectedProvenance = 'france';
 
     /** Select a forfait de pose option */
     function selectForfait(type) {
@@ -599,13 +531,11 @@
       selectedForfait = type;
     }
 
-    /** Select a caveau option */
-    function selectCaveau(type) {
-      document.querySelectorAll('#caveau-aucun, #caveau-simple-fond, #caveau-simple-sans, #caveau-double').forEach(function(el) {
-        el.classList.remove('selected');
-      });
-      document.getElementById('caveau-' + type).classList.add('selected');
-      selectedCaveau = type;
+    /** Select provenance du granit */
+    function selectProvenance(type) {
+      document.getElementById('prov-france').classList.toggle('selected', type === 'france');
+      document.getElementById('prov-import').classList.toggle('selected', type === 'import');
+      selectedProvenance = type;
     }
 
     // ==================== EMAIL VALIDATION (US-014) ====================
@@ -643,7 +573,7 @@
         commentaires: document.getElementById('inputCommentaires').value.trim(),
         remise: document.getElementById('inputRemise').value,
         forfait: selectedForfait,
-        caveau: selectedCaveau
+        provenance: selectedProvenance
       };
       localStorage.setItem('icollectivites_devis', JSON.stringify(data));
       return data;
@@ -666,7 +596,7 @@
         if (data.commentaires) document.getElementById('inputCommentaires').value = data.commentaires;
         if (data.remise) document.getElementById('inputRemise').value = data.remise;
         if (data.forfait) selectForfait(data.forfait);
-        if (data.caveau) selectCaveau(data.caveau);
+        if (data.provenance) selectProvenance(data.provenance);
       } catch (e) { /* ignore */ }
     }
 
@@ -714,10 +644,50 @@
 
     // ==================== INIT ====================
 
+    const WR_SERVER = 'https://wr-lumis3d.lumiscaphe.com';
+    const WR_DATABASE_ID = 'b426509a-077a-4c94-b28f-06cb67d553fa';
+    const WR_DEFAULT_CAMERA = '8c01be9c-8496-4bc6-90fc-5e2eecbf4411';
+
+    /** Charge l'image 0 du monument depuis WebRender Snapshot */
+    function loadMonumentImage(config) {
+      if (!config || !config.wrConfigString) return;
+      var payload = {
+        scene: [{ database: WR_DATABASE_ID, configuration: config.wrConfigString }],
+        mode: { vrObject: { camera: WR_DEFAULT_CAMERA, frames: 1 } },
+        renderParameters: { width: 1024, height: 768, antialiasing: false, superSampling: '2' },
+        encoder: { jpeg: { quality: 85 } }
+      };
+      fetch(WR_SERVER + '/Snapshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.url) {
+          var img = document.getElementById('monumentImage');
+          img.src = data.url.startsWith('http') ? data.url : WR_SERVER + data.url;
+          img.onload = function() {
+            img.style.display = 'block';
+            document.getElementById('monumentPlaceholder').style.display = 'none';
+          };
+        }
+      })
+      .catch(function(e) {
+        console.error('Snapshot WebRender échoué:', e);
+        document.querySelector('#monumentPlaceholder .ph-text').textContent = 'Rendu 3D indisponible';
+      });
+    }
+
     const config = loadConfig();
-    renderRecap(config);
     updateTopbar(config);
+    loadMonumentImage(config);
     restoreDevisData();
+
+    // Synchroniser la provenance depuis le configurateur si pas déjà dans devis
+    if (config && config.provenance && !localStorage.getItem('icollectivites_devis')) {
+      selectProvenance(config.provenance);
+    }
 
     // Set default project name if not restored
     if (!document.getElementById('inputNomProjet').value) {

@@ -3,7 +3,7 @@
 **Projet** : 016-CIMTEA configurateur (iCollectivites)
 **Date de creation** : 24/03/2026
 **PO** : A definir
-**Derniere mise a jour** : 26/03/2026
+**Derniere mise a jour** : 01/04/2026
 **Source specs** : `INPUTS/20250109 - CIMTEA.pdf` (10 pages), `INPUTS/Cimtea - Scenario utilisation.pptx.pdf` (10 pages)
 
 ---
@@ -175,37 +175,41 @@ Afin de generer un dossier commercial complet.
 
 #### [US-006] Choix du granit (corps du columbarium)
 
-**Priorite** : Haute | **SP** : 3 | **Sprint** : #2 (Prevu) | **Status** : To Do | **Epic** : EPIC-04
+**Priorite** : Haute | **SP** : 3 | **Sprint** : #2 | **Status** : Done | **Epic** : EPIC-04
 
 En tant qu'utilisateur,
 Je veux choisir le coloris du granit pour le corps du columbarium,
 Afin de personnaliser l'aspect du produit.
 
 **Criteres d'acceptation :**
-- [ ] Nouvelle etape dans la sidebar du configurateur (apres Caveau, avant Recap)
-- [ ] Selection parmi les coloris : Rose Porrino, Balmoral, Bianco Carrara, Crema Julia, Kriscon Chocolat, Labrador Vert, Noir Absolu Extra, Tarn Gris, Tarn Marron
-- [ ] Cards avec pastille couleur simulee pour chaque granit
-- [ ] Choix sauvegarde dans localStorage et affiche dans le recapitulatif
-- [ ] Stepbar mise a jour avec l'etape Granit
+- [x] Picker granit inline dans chaque étape du configurateur (modules, bancs, recueillement)
+- [x] Coloris alignés sur la base WebRender : Bleu, Gris, Rose
+- [x] Pastilles couleur avec nom complet pour chaque granit
+- [x] Choix sauvegardé dans localStorage et affiché dans le récapitulatif
+- [x] Stepbar mise à jour
+
+**Note** : Coloris mis à jour le 01/04/2026 suite au changement de base WebRender (b426509a).
 
 **Source** : Scenario Lumiscaphe p.6, PDF p.7
 
 ---
 
-#### [US-007] Choix des portes (5 matieres)
+#### [US-007] Choix des portes (4 matières)
 
-**Priorite** : Haute | **SP** : 3 | **Sprint** : #2 (Prevu) | **Status** : To Do | **Epic** : EPIC-04
+**Priorite** : Haute | **SP** : 3 | **Sprint** : #2 | **Status** : Done | **Epic** : EPIC-04
 
 En tant qu'utilisateur,
-Je veux choisir la matiere des portes du columbarium,
+Je veux choisir la matière des portes du columbarium,
 Afin de personnaliser les finitions.
 
 **Criteres d'acceptation :**
-- [ ] Nouvelle etape dans la sidebar du configurateur (apres Granit, avant Recap)
-- [ ] 5 matieres selectionnables : Noir Absolu, Noir Afrique, Bleu Lanhelin, Gris Tarn, Lanhelin
-- [ ] Cards avec pastille couleur simulee pour chaque matiere
-- [ ] Choix sauvegarde dans localStorage et affiche dans le recapitulatif
-- [ ] Stepbar mise a jour avec l'etape Portes
+- [x] Picker portes inline dans les étapes modules du configurateur
+- [x] 4 matières alignées sur la base WebRender : Gris, Noir, Noir Moucheté, Rose
+- [x] Pastilles couleur avec nom complet pour chaque matière
+- [x] Choix sauvegardé dans localStorage et affiché dans le récapitulatif
+- [x] Stepbar mise à jour
+
+**Note** : Matières mises à jour le 01/04/2026 suite au changement de base WebRender (b426509a).
 
 **Source** : PDF p.7, Scenario Lumiscaphe p.5
 
@@ -299,7 +303,7 @@ Afin de visualiser ma configuration avant de demander un devis.
 **Notes techniques :**
 Moteur Lumiscaphe WebRender (ADR-005), PAS Three.js.
 Serveur : https://wr-lumis3d.lumiscaphe.com
-Database : abf5282e-8ba4-443c-9dac-2a8d3434f034
+Database : b426509a-077a-4c94-b28f-06cb67d553fa
 API : https://app.swaggerhub.com/apis/Lumiscaphe/WebRender/1.0
 Viewer : @lumiscaphe/ng-viewer
 

@@ -288,7 +288,6 @@
     <!-- Toolbar caméras -->
     <div class="viewport-toolbar">
       <button class="vp-btn active" onclick="setCamera('default')" title="Vue 360°">360</button>
-      <button class="vp-btn" onclick="setCamera('front')" title="Vue de face">Face</button>
       <button class="vp-btn" onclick="setCamera('top')" title="Vue de dessus">Top</button>
       <button class="vp-btn" onclick="setCamera('left')" title="Vue de gauche">Côté</button>
       <button class="vp-btn" title="Réalité augmentée — bientôt disponible" style="opacity:0.35;cursor:not-allowed" disabled>AR</button>
@@ -475,6 +474,7 @@
           </div>
         </div>
         <div class="granit-picker" id="granit-picker-7"></div>
+        <div class="granit-picker" id="carreaux-picker-7"></div>
       </div>
 
       <!-- ===== ETAPE 12 : Recapitulatif ===== -->
@@ -517,6 +517,7 @@
           <h4>Finitions</h4>
           <div id="recap-granits"></div>
           <div id="recap-portes-list"></div>
+          <div id="recap-carreaux"></div>
         </div>
       </div>
 
@@ -553,14 +554,13 @@
       'aucun':'Aucun','7':'7 cases','10':'10 cases','12':'12 cases',
       'berlin':'Banc Berlin','saphir':'Banc Saphir 120',
       'idealo':'IDEALO 2023',
-      'rose-porrino':'Rose Porrino','balmoral':'Balmoral','branco-carrara':'Branco Carrara',
-      'crema-julia':'Crema Julia','kinawa-classico':'Kinawa Classico','labrador-vert':'Labrador Vert',
-      'noir-absoluto':'Noir Absoluto','tarn-moyen':'Tarn Moyen','tarn-marron':'Tarn Marron'
+      'bleu':'Bleu','gris':'Gris','rose':'Rose',
+      'noir':'Noir','noir-mouchete':'Noir Moucheté'
     };
 
     // ==================== WEBRENDER CONFIG ====================
     const WR_SERVER = 'https://wr-lumis3d.lumiscaphe.com';
-    const WR_DATABASE_ID = 'abf5282e-8ba4-443c-9dac-2a8d3434f034';
+    const WR_DATABASE_ID = 'b426509a-077a-4c94-b28f-06cb67d553fa';
 
     // Camera GUIDs (pour Snapshot API) + bookmark paths (pour ImageFromBookmark)
     const WR_CAMERAS = {
@@ -576,29 +576,20 @@
     const WR_BANC = { 'aucun': 'Aucun', 'berlin': 'Berlin', 'saphir': 'Saphir120' };
     const WR_IDEALO = { 'aucun': 'Sans', 'idealo': 'Avec' };
     const WR_GRANIT = {
-      'rose-porrino': 'RosePorrino', 'balmoral': 'Balmoral', 'branco-carrara': 'BrancoCarrara',
-      'crema-julia': 'CremaJulia', 'kinawa-classico': 'KinawaClassico', 'labrador-vert': 'LabradorVert',
-      'noir-absoluto': 'NoirAbsoluto', 'tarn-moyen': 'TarnMoyen', 'tarn-marron': 'TarnMarron'
+      'bleu': 'Bleu', 'gris': 'Gris', 'rose': 'Rose'
     };
     const WR_PORTES = {
-      'balmoral': 'Balmoral', 'labrador-vert': 'LabradorVert',
-      'noir-absoluto': 'NoirAbsoluto', 'tarn-moyen': 'TarnMoyen'
+      'gris': 'Gris', 'noir': 'Noir', 'noir-mouchete': 'Noir Moucheté', 'rose': 'Rose'
     };
 
     // Viewer instance (loaded async)
     let viewer = null;
 
-    // Granit data — aligned with WebRender (9 coloris)
+    // Granit data — aligned with WebRender (3 coloris)
     const GRANITS = [
-      { id: 'rose-porrino', nom: 'Rose Porrino', color: '#c4867a' },
-      { id: 'balmoral', nom: 'Balmoral', color: '#8b6f5e' },
-      { id: 'branco-carrara', nom: 'Branco Carrara', color: '#e8e4df' },
-      { id: 'crema-julia', nom: 'Crema Julia', color: '#d4c4a8' },
-      { id: 'kinawa-classico', nom: 'Kinawa Classico', color: '#4a3728' },
-      { id: 'labrador-vert', nom: 'Labrador Vert', color: '#2d4a3e' },
-      { id: 'noir-absoluto', nom: 'Noir Absoluto', color: '#1a1a1a' },
-      { id: 'tarn-moyen', nom: 'Tarn Moyen', color: '#7a7a7a' },
-      { id: 'tarn-marron', nom: 'Tarn Marron', color: '#6b4e3d' }
+      { id: 'bleu', nom: 'Bleu', color: '#4a6a8a' },
+      { id: 'gris', nom: 'Gris', color: '#7a7a7a' },
+      { id: 'rose', nom: 'Rose', color: '#c4867a' }
     ];
 
     // Steps that have a granit picker (sans Colonne=4)
@@ -606,14 +597,26 @@
 
     // Portes data — aligned with WebRender (4 granits portes)
     const PORTES = [
-      { id: 'balmoral', nom: 'Balmoral', color: '#8b6f5e' },
-      { id: 'labrador-vert', nom: 'Labrador Vert', color: '#2d4a3e' },
-      { id: 'noir-absoluto', nom: 'Noir Absoluto', color: '#1a1a1a' },
-      { id: 'tarn-moyen', nom: 'Tarn Moyen', color: '#7a7a7a' }
+      { id: 'gris', nom: 'Gris', color: '#7a7a7a' },
+      { id: 'noir', nom: 'Noir', color: '#1a1a1a' },
+      { id: 'noir-mouchete', nom: 'Noir Moucheté', color: '#2a2a2a' },
+      { id: 'rose', nom: 'Rose', color: '#c4867a' }
     ];
 
     const portesChoices = {};
     const STEPS_WITH_PORTES = [2, 3];
+
+    // Carreaux (sol) — configurable dans step Recueillement
+    let carreauxChoice = null;
+    const WR_CARREAUX = {
+      'gris': 'Gris', 'noir': 'Noir', 'noir-mouchete': 'Noir Moucheté', 'rose': 'Rose'
+    };
+    const CARREAUX = [
+      { id: 'gris', nom: 'Gris', color: '#7a7a7a' },
+      { id: 'noir', nom: 'Noir', color: '#1a1a1a' },
+      { id: 'noir-mouchete', nom: 'Noir Moucheté', color: '#2a2a2a' },
+      { id: 'rose', nom: 'Rose', color: '#c4867a' }
+    ];
 
 
     // ==================== TOPBAR (ADR-003) ====================
@@ -694,8 +697,7 @@
     }
 
     function getActiveSteps() {
-      const steps = [2, 3, 5, 6, 7, 12];
-      return steps;
+      return [3, 6, 7, 2, 5, 12];
     }
 
     // ==================== SELECTION ====================
@@ -718,7 +720,7 @@
         html += '<div class="granit-swatch-item">' +
           '<div class="granit-swatch' + sel + '" style="background:' + g.color + '" ' +
           'onclick="selectGranit(' + step + ',\'' + g.id + '\')" title="' + g.nom + '"></div>' +
-          '<span class="granit-swatch-label">' + g.nom.split(' ')[0] + '</span></div>';
+          '<span class="granit-swatch-label">' + g.nom + '</span></div>';
       });
       html += '</div>';
       return html;
@@ -753,7 +755,7 @@
         html += '<div class="granit-swatch-item">' +
           '<div class="granit-swatch' + sel + '" style="background:' + p.color + '" ' +
           'onclick="selectPortes(' + step + ',\'' + p.id + '\')" title="' + p.nom + '"></div>' +
-          '<span class="granit-swatch-label">' + p.nom.split(' ')[0] + '</span></div>';
+          '<span class="granit-swatch-label">' + p.nom + '</span></div>';
       });
       html += '</div>';
       return html;
@@ -778,6 +780,39 @@
       updateViewer();
     }
 
+    // ==================== CARREAUX PICKER (step 7) ====================
+
+    /** Build carreaux picker HTML */
+    function buildCarreauxPickerHTML() {
+      let html = '<h4>Carreaux (sol)</h4><div class="granit-swatches">';
+      CARREAUX.forEach(function(c) {
+        const sel = carreauxChoice === c.id ? ' selected' : '';
+        html += '<div class="granit-swatch-item">' +
+          '<div class="granit-swatch' + sel + '" style="background:' + c.color + '" ' +
+          'onclick="selectCarreaux(\'' + c.id + '\')" title="' + c.nom + '"></div>' +
+          '<span class="granit-swatch-label">' + c.nom + '</span></div>';
+      });
+      html += '</div>';
+      return html;
+    }
+
+    /** Render carreaux picker in step 7 */
+    function renderCarreauxPicker() {
+      var el = document.getElementById('carreaux-picker-7');
+      if (el) el.innerHTML = buildCarreauxPickerHTML();
+    }
+
+    /** Select carreaux material */
+    function selectCarreaux(value) {
+      carreauxChoice = value;
+      var container = document.getElementById('carreaux-picker-7');
+      container.querySelectorAll('.granit-swatch').forEach(function(s) { s.classList.remove('selected'); });
+      var swatches = container.querySelectorAll('.granit-swatch');
+      var idx = CARREAUX.findIndex(function(c) { return c.id === value; });
+      if (idx >= 0 && swatches[idx]) swatches[idx].classList.add('selected');
+      updateViewer();
+    }
+
     // ==================== WEBRENDER VIEWER ====================
 
     /** Build configuration string for WebRender (13 params slash-separated) */
@@ -787,14 +822,14 @@
       parts.push('BancG.' + (WR_BANC[choices[6]] || 'Berlin'));
       parts.push('ColumbD.' + (WR_COLUMB[choices[2]] || '7Cases'));
       parts.push('ColumbG.' + (WR_COLUMB[choices[3]] || '7Cases'));
-      parts.push('GranitBancD.' + (WR_GRANIT[granitChoices[5]] || 'Balmoral'));
-      parts.push('GranitBancG.' + (WR_GRANIT[granitChoices[6]] || 'Balmoral'));
-      parts.push('GranitCarreaux.NoirAbsoluto'); // fixe pour le moment, config sol à venir
-      parts.push('GranitIdealo.' + (WR_GRANIT[granitChoices[7]] || 'Balmoral'));
-      parts.push('GranitMonumentD.' + (WR_GRANIT[granitChoices[2]] || 'Balmoral'));
-      parts.push('GranitMonumentG.' + (WR_GRANIT[granitChoices[3]] || 'Balmoral'));
-      parts.push('GranitPortesD.' + (WR_PORTES[portesChoices[2]] || 'NoirAbsoluto'));
-      parts.push('GranitPortesG.' + (WR_PORTES[portesChoices[3]] || 'NoirAbsoluto'));
+      parts.push('GranitBancD.' + (WR_GRANIT[granitChoices[5]] || 'Gris'));
+      parts.push('GranitBancG.' + (WR_GRANIT[granitChoices[6]] || 'Gris'));
+      parts.push('GranitCarreaux.' + (WR_CARREAUX[carreauxChoice] || 'Noir'));
+      parts.push('GranitIdealo.' + (WR_GRANIT[granitChoices[7]] || 'Gris'));
+      parts.push('GranitMonumentD.' + (WR_GRANIT[granitChoices[2]] || 'Gris'));
+      parts.push('GranitMonumentG.' + (WR_GRANIT[granitChoices[3]] || 'Gris'));
+      parts.push('GranitPortesD.' + (WR_PORTES[portesChoices[2]] || 'Noir'));
+      parts.push('GranitPortesG.' + (WR_PORTES[portesChoices[3]] || 'Noir'));
       parts.push('Idealo.' + (WR_IDEALO[choices[7]] || 'Avec'));
       return parts.join('/');
     }
@@ -888,26 +923,22 @@
 
     // ==================== NAVIGATION ====================
     function nextStep() {
-      if (currentStep === TOTAL) return;
-      var next = currentStep + 1;
-      if (next === 1) next = 2;
-      if (next === 4) next = 5; // skip removed step 4 (Colonne)
-      if (next >= 8 && next < 12) next = 12; // skip removed steps 8-11
+      var steps = getActiveSteps();
+      var idx = steps.indexOf(currentStep);
+      if (idx >= steps.length - 1) return;
+      var next = steps[idx + 1];
       if (next === TOTAL) buildRecap();
       showStep(next);
     }
 
     function prevStep() {
-      if (currentStep <= 0) return;
-      if (currentStep === 2) {
+      var steps = getActiveSteps();
+      var idx = steps.indexOf(currentStep);
+      if (idx <= 0) {
         window.location.href = 'catalogue.html?besoin=columbarium&gamme=emeraude';
         return;
       }
-      var prev = currentStep - 1;
-      if (prev >= 8) prev = 7; // skip removed steps 8-11
-      if (prev === 4) prev = 3; // skip removed step 4 (Colonne)
-      if (prev === 1) prev = 2;
-      showStep(prev);
+      showStep(steps[idx - 1]);
     }
 
     function showStep(n) {
@@ -999,6 +1030,14 @@
       });
       document.getElementById('recap-portes-list').innerHTML = portesHTML;
 
+      // Carreaux (sol)
+      var carreauxHTML = '';
+      if (carreauxChoice) {
+        carreauxHTML = '<div class="recap-row"><span class="label">Carreaux (sol)</span>' +
+          '<span class="value">' + l(carreauxChoice) + '</span></div>';
+      }
+      document.getElementById('recap-carreaux').innerHTML = carreauxHTML;
+
     }
 
     // ==================== SAVE CONFIG & NAVIGATE ====================
@@ -1015,6 +1054,7 @@
         recueillement: choices[7],
         granits: Object.assign({}, granitChoices),
         portes: Object.assign({}, portesChoices),
+        carreaux: carreauxChoice,
         wrConfigString: buildConfigString(),
         labels: labels
       };
@@ -1038,9 +1078,15 @@
       select(6, 'aucun');
       select(7, 'aucun');
 
-      // Render granit and portes pickers
+      // Render granit, portes and carreaux pickers
       renderGranitPickers();
       renderPortesPickers();
+      renderCarreauxPicker();
+
+      // Pré-sélection des couleurs par défaut (alignées sur le XML p3D)
+      STEPS_WITH_GRANIT.forEach(function(s) { selectGranit(s, 'gris'); });
+      STEPS_WITH_PORTES.forEach(function(s) { selectPortes(s, 'noir'); });
+      selectCarreaux('noir');
 
       // Restore choices from localStorage if available (returning from devis)
       const saved = localStorage.getItem('icollectivites_config');
@@ -1064,10 +1110,12 @@
               if (config.portes[s]) selectPortes(s, config.portes[s]);
             });
           }
+          // Restore carreaux choice
+          if (config.carreaux) selectCarreaux(config.carreaux);
         } catch (e) { /* ignore parse errors */ }
       }
 
-      showStep(2);
+      showStep(3);
 
       // Initialize WebRender 3D viewer
       initViewer();

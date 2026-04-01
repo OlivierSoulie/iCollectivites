@@ -18,25 +18,27 @@
     /* --- Panneau recap gauche --- */
     .recap-panel {
       flex: 1;
-      overflow-y: auto;
-      padding: 40px;
-      -webkit-overflow-scrolling: touch;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 20px;
       background: linear-gradient(145deg, #2c2c30 0%, #1a1a1e 50%, #0d0d0f 100%);
+      overflow: hidden;
+      height: calc(100vh - 56px); height: calc(100dvh - 56px);
     }
 
-    .recap-panel::-webkit-scrollbar { display: none; }
-
     .recap-panel h2 {
-      font-size: 24px;
+      font-size: 20px;
       font-weight: 700;
       color: white;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
+      flex-shrink: 0;
     }
 
     .recap-panel .recap-sub {
-      font-size: 14px;
+      font-size: 13px;
       color: rgba(255,255,255,0.4);
-      margin-bottom: 24px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
     }
 
     .recap-card {
@@ -60,7 +62,7 @@
 
     .recap-card .recap-line {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
       padding: 6px 0;
       border-bottom: 1px solid rgba(255,255,255,0.06);
       font-size: 14px;
@@ -70,27 +72,45 @@
 
     .recap-card .recap-line .rl-label {
       color: rgba(255,255,255,0.5);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 2px;
     }
 
     .recap-card .recap-line .rl-value {
       color: white;
       font-weight: 500;
+      word-break: break-word;
     }
 
-    /* --- Bottom row: image + config side by side --- */
+    /* --- Layout : infos en haut, image + config en bas côte à côte --- */
     .recap-bottom-row {
       display: flex;
-      gap: 16px;
+      gap: 12px;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
     }
+
+    .recap-bottom-row > .recap-card {
+      flex: 1;
+      min-width: 0;
+      overflow-y: auto;
+      margin-bottom: 0;
+    }
+
+    .recap-bottom-row > .recap-card::-webkit-scrollbar { display: none; }
 
     .recap-image-card {
-      flex: 1;
-      min-width: 0;
+      display: flex;
+      flex-direction: column;
     }
 
-    .recap-config-card {
+    .recap-image-card img {
       flex: 1;
-      min-width: 0;
+      min-height: 0;
+      object-fit: contain !important;
     }
 
     .project-image-placeholder {
@@ -293,7 +313,7 @@
     <h2 id="recapTitle">Récapitulatif du devis</h2>
     <p class="recap-sub" id="recapProjectName">—</p>
 
-    <div class="recap-card" id="recapInfos">
+    <div class="recap-card" id="recapInfos" style="flex-shrink:0;overflow-y:auto;max-height:35%;">
       <h3>Informations projet</h3>
       <div id="recapInfosLines"></div>
     </div>
@@ -301,12 +321,13 @@
     <div class="recap-bottom-row">
       <div class="recap-card recap-image-card">
         <h3>Aperçu du projet</h3>
-        <div class="project-image-placeholder">
-          <div class="pi-icon">&#9965;</div>
-          <div class="pi-text">Visualisation 3D</div>
+        <div class="project-image-placeholder" id="monumentPlaceholder">
+          <div class="pi-icon">&#9881;</div>
+          <div class="pi-text">Chargement du rendu 3D…</div>
         </div>
+        <img id="monumentImage" src="" alt="Rendu 3D du columbarium" style="display:none;width:100%;border-radius:var(--radius-sm);object-fit:contain;">
       </div>
-      <div class="recap-card recap-config-card" id="recapConfig">
+      <div class="recap-card" id="recapConfig">
         <h3>Configuration</h3>
         <div id="recapConfigLines"></div>
       </div>
@@ -394,6 +415,19 @@
         '</div>';
     }
 
+    /** Build a row of multiple recap lines side by side */
+    function recapRow(items) {
+      var html = '<div style="display:flex;gap:12px">';
+      items.forEach(function(item) {
+        html += '<div class="recap-line" style="flex:1">' +
+          '<span class="rl-label">' + item.label + '</span>' +
+          '<span class="rl-value">' + (item.value || '—') + '</span>' +
+          '</div>';
+      });
+      html += '</div>';
+      return html;
+    }
+
     /** Render config recap in left panel */
     function renderConfigRecap(config) {
       if (!config) return;
@@ -446,14 +480,26 @@
       if (!devis) return;
       let html = '';
 
-      html += recapLine('Client', devis.nomClient);
-      html += recapLine('Email', devis.email);
-      html += recapLine('Commune', devis.commune);
-      html += recapLine('Référence', devis.reference || '—');
-      html += recapLine('Remise', (devis.remise || '0') + ' %');
-      html += recapLine('Forfait pose', devis.forfait ? devis.forfait.charAt(0).toUpperCase() + devis.forfait.slice(1) : '—');
+      html += recapRow([
+        { label: 'Client', value: devis.nomClient },
+        { label: 'Email', value: devis.email }
+      ]);
+      html += recapRow([
+        { label: 'Commune', value: devis.commune },
+        { label: 'Référence', value: devis.reference || '—' }
+      ]);
+      var provLabel = devis.provenance === 'import'
+        ? 'Import <svg width="16" height="11" viewBox="0 0 30 20" style="border-radius:2px;vertical-align:middle;margin-left:4px"><rect width="30" height="20" fill="#DE2910"/><polygon points="5,2 6.2,5.5 3,3.7 7,3.7 3.8,5.5" fill="#FFDE00"/></svg><svg width="16" height="11" viewBox="0 0 30 20" style="border-radius:2px;vertical-align:middle;margin-left:2px"><rect width="30" height="10" fill="#FF9933"/><rect y="10" width="30" height="10" fill="#138808"/><rect y="7" width="30" height="6" fill="#fff"/><circle cx="15" cy="10" r="3" fill="none" stroke="#000080" stroke-width="0.5"/></svg>'
+        : 'France <svg width="16" height="11" viewBox="0 0 30 20" style="border-radius:2px;vertical-align:middle;margin-left:4px"><rect width="10" height="20" fill="#002395"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#ED2939"/></svg>';
+      html += recapRow([
+        { label: 'Remise', value: (devis.remise || '0') + ' %' },
+        { label: 'Forfait pose', value: devis.forfait ? devis.forfait.charAt(0).toUpperCase() + devis.forfait.slice(1) : '—' },
+        { label: 'Provenance', value: provLabel }
+      ]);
       if (devis.commentaires) {
-        html += recapLine('Commentaires', devis.commentaires);
+        html += '<div class="recap-line"><span class="rl-label">Commentaires</span>' +
+          '<span class="rl-value" style="max-height:3.6em;overflow-y:auto;line-height:1.2em">' +
+          devis.commentaires.replace(/\n/g, '<br>') + '</span></div>';
       }
 
       document.getElementById('recapInfosLines').innerHTML = html;
@@ -485,6 +531,41 @@
       window.location.href = 'devis.html';
     }
 
+    // ==================== WEBRENDER SNAPSHOT ====================
+    const WR_SERVER = 'https://wr-lumis3d.lumiscaphe.com';
+    const WR_DATABASE_ID = 'b426509a-077a-4c94-b28f-06cb67d553fa';
+    const WR_DEFAULT_CAMERA = '8c01be9c-8496-4bc6-90fc-5e2eecbf4411';
+
+    function loadMonumentImage(config) {
+      if (!config || !config.wrConfigString) return;
+      var payload = {
+        scene: [{ database: WR_DATABASE_ID, configuration: config.wrConfigString }],
+        mode: { vrObject: { camera: WR_DEFAULT_CAMERA, frames: 1 } },
+        renderParameters: { width: 1024, height: 768, antialiasing: false, superSampling: '2' },
+        encoder: { jpeg: { quality: 85 } }
+      };
+      fetch(WR_SERVER + '/Snapshot', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data && data.url) {
+          var img = document.getElementById('monumentImage');
+          img.src = data.url.startsWith('http') ? data.url : WR_SERVER + data.url;
+          img.onload = function() {
+            img.style.display = 'block';
+            document.getElementById('monumentPlaceholder').style.display = 'none';
+          };
+        }
+      })
+      .catch(function(e) {
+        console.error('Snapshot WebRender échoué:', e);
+        document.querySelector('#monumentPlaceholder .pi-text').textContent = 'Rendu 3D indisponible';
+      });
+    }
+
     // ==================== INIT ====================
 
     const config = loadConfig();
@@ -497,6 +578,7 @@
     // Render recaps
     renderConfigRecap(config);
     renderInfosRecap(devis);
+    loadMonumentImage(config);
 
     // Set project name in title and subtitle
     var projectName = devis.nomProjet || '—';

@@ -37,13 +37,8 @@ Application iPad **iCollectivites** : outil d'aide a la vente pour CIMTEA (fabri
 
 ### 1. Demarrer avec le Product Owner
 
-Ouvrir une conversation avec Claude et copier le prompt :
-
-```
-[Copier le contenu de agents/PO-prompt.md]
-```
-
-Ensuite, decrire votre projet au PO pour creer les premieres User Stories.
+Lit la doc Webrender
+Lit le code actuel
 
 ### 2. Sprint Planning
 
