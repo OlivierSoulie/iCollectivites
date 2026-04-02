@@ -145,6 +145,7 @@ Modifications :
   - Toolbar droite viewport dissociée des caméras (gauche)
   - Viewport hint avec fond semi-transparent (lisibilité sur décor)
   - Snapshot devis : force Couple.Sans + Sol.Sans (affichage viewport uniquement)
+  - Devis : validation Commune en premier (était Nom du contact), focus auto sur Commune au chargement
 
 ---
 
