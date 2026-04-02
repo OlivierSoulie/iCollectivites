@@ -1,15 +1,17 @@
 # Kanban Board - CIMTEA iCollectivites
 
 **Projet** : 016-CIMTEA configurateur
-**Sprint** : Sprint #3
-**Sprint Goal** : Intégrer le rendu 3D Lumiscaphe WebRender dans le configurateur
-**Derniere mise a jour** : 01/04/2026
+**Sprint** : Sprint #4
+**Sprint Goal** : Dossier devis simulé (remis en mairie) + Logique métier
+**Dernière mise à jour** : 02/04/2026
 
 ---
 
 ## To Do
 
-(vide)
+| US | Titre | SP | Assigné |
+|---|---|---|---|
+| US-010 | Logique métier et contraintes | 5 | — |
 
 ---
 
@@ -28,6 +30,24 @@
 ## Testing
 
 (vide)
+
+---
+
+## Done (Sprint #4)
+
+| US | Titre | SP | Validation |
+|---|---|---|---|
+| US-012 | Génération dossier devis simulé | 5 | Stakeholder validé 01/04/2026 |
+
+**Améliorations validées (02/04/2026) :**
+- Nouvelle base WebRender : `b3fa2076-6b4f-47fd-b01f-c4f316df847c` (15 paramètres)
+- Contrôles viewport : bouton Sol (Sans/Béton/Graviers) + toggle Référence (Couple)
+- Refactoring DRY : `WR_DATABASE_ID` centralisé dans `shared.js` uniquement
+- Dossier devis : filigrane "CONFIDENTIEL" gravé dans les pixels des pages statiques (canvas)
+- Viewport hint : fond semi-transparent pour lisibilité sur décor 3D
+- Snapshot devis : force `Couple.Sans` et `Sol.Sans` (options d'affichage viewport exclues)
+
+**SP livrés Sprint #4** : 5/10 SP (50%)
 
 ---
 
@@ -102,19 +122,43 @@ ADRs :
 
 ---
 
+## Sprint #4 — Livrables
+
+**US-012 — Génération dossier devis simulé**
+
+Modifications :
+- `code/maquette/dossier-devis.html` — Dossier complet 46 pages
+  - Pages PDF statiques avec filigrane "CONFIDENTIEL" gravé dans les pixels (canvas blur + watermark)
+  - Page visuel 3D dynamique (Snapshot WebRender + tableau config)
+  - Page devis chiffré dynamique (tableau lignes + totaux HT/TVA/TTC)
+  - Sidebar résumé financier + infos client
+
+**Améliorations WebRender (02/04/2026)**
+
+Modifications :
+- `code/maquette/shared.js` — Database ID centralisé : `b3fa2076-6b4f-47fd-b01f-c4f316df847c`
+- `code/maquette/configurateur.html`
+  - Import `shared.js` ajouté (suppression doublon WR_SERVER/WR_DATABASE_ID)
+  - 15 paramètres WebRender (ajout Sol + Couple)
+  - Bouton "Sol" viewport (menu popup : Sans/Béton/Graviers)
+  - Toggle "Référence" viewport (icône règle+personnage, Couple Avec/Sans)
+  - Toolbar droite viewport dissociée des caméras (gauche)
+  - Viewport hint avec fond semi-transparent (lisibilité sur décor)
+  - Snapshot devis : force Couple.Sans + Sol.Sans (affichage viewport uniquement)
+
+---
+
 ## ADRs crees ce sprint
 
 - **ADR-005** : Lumiscaphe WebRender au lieu de Three.js (appliquée)
 
 ---
 
-## Backlog (Sprint #4+)
+## Backlog (Sprint #5+)
 
 | US | Titre | SP | Epic |
 |---|---|---|---|
-| US-012 | Génération dossier devis simulé | 5 | EPIC-05 |
 | US-009 | Photo sur site + AR | 8 | EPIC-04 |
-| US-010 | Logique métier et contraintes | 5 | EPIC-07 |
 
 ---
 

@@ -157,14 +157,72 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      color: rgba(0,0,0,0.35);
+      color: rgba(255,255,255,0.7);
       font-size: 18px;
       font-weight: 500;
       padding: 40px;
       pointer-events: none;
       z-index: 3;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
     }
     .vp-btn.active { background: rgba(0,122,255,0.85); border-color: rgba(0,122,255,0.9); color: white; }
+
+    /* Viewport toolbar droite (sol + référence) */
+    .viewport-toolbar-right {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .vp-separator {
+      width: 1px;
+      background: rgba(255,255,255,0.15);
+      margin: 6px 2px;
+    }
+
+    .vp-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+    .vp-menu {
+      position: absolute;
+      bottom: 52px;
+      right: 0;
+      background: rgba(30,30,34,0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 4px;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 100px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+
+    .vp-menu.visible { display: flex; }
+
+    .vp-menu-item {
+      padding: 8px 14px;
+      border: none;
+      background: none;
+      color: rgba(255,255,255,0.7);
+      font-size: 13px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      border-radius: 8px;
+      text-align: left;
+      transition: all 0.1s;
+      white-space: nowrap;
+    }
+
+    .vp-menu-item:hover { background: rgba(255,255,255,0.1); color: white; }
+    .vp-menu-item.active { background: rgba(0,122,255,0.3); color: var(--primary); font-weight: 600; }
 
     /* ============================================
        SIDEBAR — Panneau de configuration (droite)
@@ -291,6 +349,26 @@
       <button class="vp-btn" onclick="setCamera('top')" title="Vue de dessus">Top</button>
       <button class="vp-btn" onclick="setCamera('left')" title="Vue de gauche">Côté</button>
       <button class="vp-btn" title="Réalité augmentée — bientôt disponible" style="opacity:0.35;cursor:not-allowed" disabled>AR</button>
+    </div>
+
+    <!-- Toolbar droite : Référence + Sol -->
+    <div class="viewport-toolbar-right">
+      <!-- Sol -->
+      <div style="position:relative">
+        <button class="vp-btn" onclick="toggleSolMenu()" id="btn-sol" title="Type de sol">Sol</button>
+        <div class="vp-menu" id="sol-menu">
+          <button class="vp-menu-item active" onclick="setSol('sans')" id="sol-sans">Sans</button>
+          <button class="vp-menu-item" onclick="setSol('beton')" id="sol-beton">Béton</button>
+          <button class="vp-menu-item" onclick="setSol('galets')" id="sol-galets">Graviers</button>
+        </div>
+      </div>
+
+      <div class="vp-separator"></div>
+
+      <!-- Référence (couple) -->
+      <button class="vp-btn" onclick="toggleCouple()" id="btn-couple" title="Référence (personnage)">
+        <svg viewBox="0 0 24 24"><line x1="4" y1="4" x2="4" y2="20"/><line x1="2" y1="4" x2="6" y2="4"/><line x1="2" y1="20" x2="6" y2="20"/><line x1="2" y1="8" x2="6" y2="8"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="2" y1="16" x2="6" y2="16"/><circle cx="15" cy="8" r="2.5"/><path d="M10 20v-3a5 5 0 0 1 10 0v3"/></svg>
+      </button>
     </div>
   </div>
 
@@ -536,6 +614,7 @@
 
   </div><!-- /sidebar -->
 
+  <script src="shared.js"></script>
   <script>
     // ==================== STATE ====================
     let currentStep = 0;
@@ -559,10 +638,9 @@
     };
 
     // ==================== WEBRENDER CONFIG ====================
-    const WR_SERVER = 'https://wr-lumis3d.lumiscaphe.com';
-    const WR_DATABASE_ID = 'b426509a-077a-4c94-b28f-06cb67d553fa';
+    // WR_SERVER, WR_DATABASE_ID, WR_DEFAULT_CAMERA définis dans shared.js
 
-    // Camera GUIDs (pour Snapshot API) + bookmark paths (pour ImageFromBookmark)
+    // Camera GUIDs
     const WR_CAMERAS = {
       default: '8c01be9c-8496-4bc6-90fc-5e2eecbf4411',
       front:   '863e23c0-9ac0-4f66-95a5-755ec12d3cad',
@@ -581,9 +659,15 @@
     const WR_PORTES = {
       'gris': 'Gris', 'noir': 'Noir', 'noir-mouchete': 'Noir Moucheté', 'rose': 'Rose'
     };
+    const WR_SOL = { 'sans': 'Sans', 'beton': 'Béton', 'galets': 'Galets' };
+    const WR_COUPLE = { true: 'Avec', false: 'Sans' };
 
     // Viewer instance (loaded async)
     let viewer = null;
+
+    // Sol & Couple state
+    let solChoice = 'sans';
+    let coupleActive = false;
 
     // Granit data — aligned with WebRender (3 coloris)
     const GRANITS = [
@@ -787,13 +871,14 @@
 
     // ==================== WEBRENDER VIEWER ====================
 
-    /** Build configuration string for WebRender (13 params slash-separated) */
+    /** Build configuration string for WebRender (15 params slash-separated, alphabetical) */
     function buildConfigString() {
       var parts = [];
       parts.push('BancD.' + (WR_BANC[choices[5]] || 'Berlin'));
       parts.push('BancG.' + (WR_BANC[choices[6]] || 'Berlin'));
       parts.push('ColumbD.' + (WR_COLUMB[choices[2]] || '7Cases'));
       parts.push('ColumbG.' + (WR_COLUMB[choices[3]] || '7Cases'));
+      parts.push('Couple.' + (WR_COUPLE[coupleActive] || 'Sans'));
       parts.push('GranitBancD.' + (WR_GRANIT[granitChoices[5]] || 'Gris'));
       parts.push('GranitBancG.' + (WR_GRANIT[granitChoices[6]] || 'Gris'));
       parts.push('GranitCarreaux.' + (WR_CARREAUX[carreauxChoice] || 'Noir'));
@@ -803,6 +888,7 @@
       parts.push('GranitPortesD.' + (WR_PORTES[portesChoices[2]] || 'Noir'));
       parts.push('GranitPortesG.' + (WR_PORTES[portesChoices[3]] || 'Noir'));
       parts.push('Idealo.' + (WR_IDEALO[choices[7]] || 'Avec'));
+      parts.push('Sol.' + (WR_SOL[solChoice] || 'Sans'));
       return parts.join('/');
     }
 
@@ -820,7 +906,8 @@
         var hasConfig = (choices[2] && choices[2] !== 'aucun') ||
                         (choices[3] && choices[3] !== 'aucun') ||
                         (choices[5] && choices[5] !== 'aucun') ||
-                        (choices[6] && choices[6] !== 'aucun');
+                        (choices[6] && choices[6] !== 'aucun') ||
+                        (choices[7] && choices[7] !== 'aucun');
         hint.style.display = hasConfig ? 'none' : 'flex';
       }
     }
@@ -844,6 +931,39 @@
           camera: WR_CAMERAS[name]
         });
       }
+    }
+
+    /** Toggle sol menu visibility */
+    function toggleSolMenu() {
+      var menu = document.getElementById('sol-menu');
+      menu.classList.toggle('visible');
+    }
+
+    /** Set sol type */
+    function setSol(type) {
+      solChoice = type;
+      document.querySelectorAll('.vp-menu-item').forEach(function(b) { b.classList.remove('active'); });
+      document.getElementById('sol-' + type).classList.add('active');
+      var solLabels = { 'sans': 'Sol', 'beton': 'Béton', 'galets': 'Graviers' };
+      document.getElementById('btn-sol').textContent = solLabels[type];
+      document.getElementById('sol-menu').classList.remove('visible');
+      updateViewer();
+    }
+
+    // Fermer le menu sol si clic ailleurs
+    document.addEventListener('click', function(e) {
+      var menu = document.getElementById('sol-menu');
+      var btn = document.getElementById('btn-sol');
+      if (menu && !menu.contains(e.target) && e.target !== btn) {
+        menu.classList.remove('visible');
+      }
+    });
+
+    /** Toggle couple (référence personnage) */
+    function toggleCouple() {
+      coupleActive = !coupleActive;
+      document.getElementById('btn-couple').classList.toggle('active', coupleActive);
+      updateViewer();
     }
 
     /** Initialize the Lumiscaphe viewer (async dynamic import) */
@@ -1027,7 +1147,7 @@
         granits: Object.assign({}, granitChoices),
         portes: Object.assign({}, portesChoices),
         carreaux: carreauxChoice,
-        wrConfigString: buildConfigString(),
+        wrConfigString: buildConfigString().replace(/Couple\.\w+/, 'Couple.Sans').replace(/Sol\.\w+/, 'Sol.Sans'),
         labels: labels
       };
       localStorage.setItem('icollectivites_config', JSON.stringify(config));

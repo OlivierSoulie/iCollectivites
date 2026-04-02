@@ -3,7 +3,7 @@
 **Projet** : 016-CIMTEA configurateur (iCollectivites)
 **Date de creation** : 24/03/2026
 **PO** : A definir
-**Derniere mise a jour** : 01/04/2026
+**Derniere mise a jour** : 02/04/2026
 **Source specs** : `INPUTS/20250109 - CIMTEA.pdf` (10 pages), `INPUTS/Cimtea - Scenario utilisation.pptx.pdf` (10 pages)
 
 ---
@@ -259,27 +259,32 @@ Afin de transmettre l'offre au client sans quitter l'outil.
 
 ---
 
-#### [US-012] Ecran 4 — Generation dossier devis simule
+#### [US-012] Génération dossier devis simulé (dossier remis en mairie)
 
-**Priorite** : Haute | **SP** : 5 | **Sprint** : #3 (Prevu) | **Status** : To Do | **Epic** : EPIC-05
+**Priorité** : Haute | **SP** : 5 | **Sprint** : #4 (Prévu) | **Status** : To Do | **Epic** : EPIC-05
 
 En tant que commercial CIMTEA,
-Je veux generer un apercu du dossier devis,
-Afin de visualiser le rendu avant envoi.
+Je veux générer un aperçu du dossier devis complet,
+Afin de visualiser le rendu du dossier remis en mairie avant envoi.
 
-**Criteres d'acceptation :**
-- [ ] Simulation HTML du dossier devis (pas un vrai PDF)
-- [ ] Page de garde simulee avec logo CIMTEA et infos projet
-- [ ] Section devis avec configuration + remise + forfait pose
-- [ ] Section fiches techniques (placeholder simule)
-- [ ] Section photos (placeholder pour photo AR)
-- [ ] Bouton "Apercu du devis" dans devis.html qui ouvre la simulation
-- [ ] Bouton "Passer a l'envoi" vers ecran 5
+**Critères d'acceptation :**
+- [ ] Nouveau fichier `code/maquette/dossier-devis.html` (simulation HTML multi-sections)
+- [ ] Section 1 — Page de garde : logo CIMTEA, titre "Projet Columbarium", nom projet + commune (dynamique depuis localStorage)
+- [ ] Section 2 — Présentation CIMTEA : contenu statique placeholder (texte résumé entreprise)
+- [ ] Section 3 — Visuel projet : image 3D WebRender du monument configuré + récap configuration (modules, granit, portes) + dimensions
+- [ ] Section 4 — Devis chiffré : tableau avec colonnes Description / Qté / PU HT / Rem. / Montant, lignes par élément configuré, sous-total HT, TVA 20%, montant TTC, conditions de règlement (prix simulés/fictifs)
+- [ ] Section 5 — Fiches techniques : placeholder (dimensions cotées, fiche aménagement paysager)
+- [ ] Section 6 — Documents administratifs : placeholder (attestations, CGV — contenu statique)
+- [ ] Référence devis auto-générée (format DEV-XXXXXX)
+- [ ] Bouton "Aperçu du devis" dans devis.html qui ouvre dossier-devis.html
+- [ ] Bouton "Passer à l'envoi" vers envoi.html
+- [ ] Navigation retour vers devis.html
+- [ ] Design cohérent avec la charte CIMTEA (header logo, footer coordonnées, barre latérale coloris)
 
 **Notes techniques :**
-Simulation HTML dans la maquette. Le vrai PDF sera genere cote serveur dans l'application finale.
+Simulation HTML dans la maquette (pas un vrai PDF). Prix fictifs en attendant les tarifs réels (US-010). Image 3D via Snapshot API WebRender (déjà utilisé dans devis.html/envoi.html).
 
-**Source** : PDF p.8, Scenario Lumiscaphe p.8
+**Source** : PDF "Projet remis en mairie.pdf" (46 pages), Scenario Lumiscaphe p.8
 
 ---
 
@@ -303,7 +308,7 @@ Afin de visualiser ma configuration avant de demander un devis.
 **Notes techniques :**
 Moteur Lumiscaphe WebRender (ADR-005), PAS Three.js.
 Serveur : https://wr-lumis3d.lumiscaphe.com
-Database : b426509a-077a-4c94-b28f-06cb67d553fa
+Database : b3fa2076-6b4f-47fd-b01f-c4f316df847c (mise à jour 02/04/2026, 15 paramètres dont Sol et Couple)
 API : https://app.swaggerhub.com/apis/Lumiscaphe/WebRender/1.0
 Viewer : @lumiscaphe/ng-viewer
 
@@ -359,7 +364,7 @@ Afin de garantir que seules les configurations valides sont proposees.
 | US-007 | Choix portes (inline modules) | 3 | EPIC-04 | Done — Sprint #2 |
 | US-014 | Complément formulaire devis | 2 | EPIC-05 | Done — Sprint #2 |
 | US-013 | Écran 5 — Envoi email simulé | 2 | EPIC-06 | Done — Sprint #2 |
-| US-012 | Generation devis simule | 5 | EPIC-05 | To Do — Sprint #3 |
+| US-012 | Génération dossier devis simulé (dossier remis en mairie) | 5 | EPIC-05 | To Do — Sprint #4 |
 | US-008 | Lumiscaphe WebRender 3D | 8 | EPIC-04 | Done — Sprint #3 |
 | US-009 | Photo sur site + AR (ARKit) | 8 | EPIC-04 | To Do |
 | US-010 | Logique metier et contraintes | 5 | EPIC-07 | To Do |
@@ -380,7 +385,8 @@ Afin de garantir que seules les configurations valides sont proposees.
 | Photos produits catalogue | Ecran 2 + dossier devis | PDF p.6/p.8 |
 | Tarifs produits et options | Calcul devis chiffre (US-010) | PDF p.8 |
 | Forfaits pose (tarifs facile/normal/difficile) | Calcul devis | PDF p.8 |
-| ~~URL serveur WebRender~~ | ~~Requis pour US-008~~ — **RESOLU** : wr-lumis3d.lumiscaphe.com | ADR-005 |
+| ~~URL serveur WebRender~~ | ~~Requis pour US-008~~ — **RÉSOLU** : wr-lumis3d.lumiscaphe.com | ADR-005 |
+| ~~Base WebRender (database ID)~~ | ~~Requis pour US-008~~ — **RÉSOLU** : b3fa2076-6b4f-47fd-b01f-c4f316df847c (15 params) | 02/04/2026 |
 | Gamme Emeraude Courbe (convexe/concave) | Etape "Forme" supplementaire | Synthese |
 | Configurations 9 et 18 cases | Plus de choix de capacite | Synthese |
 | Catalogue Jardins du souvenir / Ossuaire | Ecrans 1-2 complets | PDF p.5 |

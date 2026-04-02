@@ -5,7 +5,7 @@
 
 // ==================== WEBRENDER CONFIG ====================
 const WR_SERVER = 'https://wr-lumis3d.lumiscaphe.com';
-const WR_DATABASE_ID = 'b426509a-077a-4c94-b28f-06cb67d553fa';
+const WR_DATABASE_ID = 'b3fa2076-6b4f-47fd-b01f-c4f316df847c';
 const WR_DEFAULT_CAMERA = '8c01be9c-8496-4bc6-90fc-5e2eecbf4411';
 
 // ==================== LOCALSTORAGE HELPERS ====================

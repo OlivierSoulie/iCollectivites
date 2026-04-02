@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>CIMTEA — Dossier Devis</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      display: flex;
+      flex-direction: row;
+      background: #1a1a1e;
+      padding-top: 56px;
+    }
+
+    /* === Document scrollable (gauche) === */
+    .doc-panel {
+      flex: 1;
+      height: calc(100vh - 56px); height: calc(100dvh - 56px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #e8e8ed;
+      padding: 24px;
+    }
+
+    .doc-panel::-webkit-scrollbar { width: 6px; }
+    .doc-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
+
+    /* === Pages (images du PDF original) === */
+    .doc-page {
+      background: white;
+      max-width: 800px;
+      margin: 0 auto 24px;
+      border-radius: 4px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    .doc-page img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .doc-page.static {
+      opacity: 0.6;
+    }
+
+    /* === Page devis dynamique === */
+    .doc-page-inner {
+      padding: 48px 56px;
+    }
+
+    /* Tableau devis chiffré */
+    .devis-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .devis-table thead th {
+      background: #1c1c1e;
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .devis-table thead th:nth-child(n+2) { text-align: right; }
+
+    .devis-table tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eee;
+      color: #333;
+    }
+
+    .devis-table tbody td:nth-child(n+2) {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .devis-table tbody tr:nth-child(even) { background: #fafafa; }
+
+    .devis-table .line-desc {
+      font-size: 12px;
+      color: #888;
+      font-style: italic;
+    }
+
+    /* Totaux */
+    .devis-totals {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 24px;
+    }
+
+    .devis-totals table {
+      border-collapse: collapse;
+      font-size: 14px;
+      min-width: 320px;
+    }
+
+    .devis-totals td {
+      padding: 8px 16px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .devis-totals td:first-child { color: #666; font-weight: 500; }
+    .devis-totals td:last-child { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    .devis-totals tr.total-ttc { background: #1c1c1e; }
+    .devis-totals tr.total-ttc td { color: white; font-size: 16px; font-weight: 700; border-bottom: none; padding: 12px 16px; }
+
+    /* En-tête devis */
+    .devis-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 24px;
+    }
+
+    .devis-ref { font-size: 24px; font-weight: 700; color: #1c1c1e; margin-bottom: 4px; }
+    .devis-date { font-size: 13px; color: #888; margin-bottom: 16px; }
+    .interlocuteur { font-size: 13px; color: #666; line-height: 1.5; }
+    .client-info { font-size: 14px; color: #333; line-height: 1.6; text-align: right; }
+    .client-info strong { font-weight: 600; }
+
+    .conditions-box {
+      background: #f5f5f7;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+
+    .conditions-box h5 {
+      font-size: 12px; font-weight: 600; color: #333;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;
+    }
+
+    .conditions-box p { font-size: 13px; color: #666; line-height: 1.5; }
+
+    .doc-footer {
+      border-top: 1px solid #ddd;
+      padding-top: 12px;
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #999;
+    }
+
+    /* === Visuel 3D === */
+    .doc-monument-wrapper {
+      background: #f5f5f7;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .doc-monument-wrapper img { max-width: 100%; height: auto; border-radius: 4px; margin: 0 auto; }
+    .doc-monument-placeholder { color: #aaa; font-size: 14px; padding: 40px; }
+
+    .config-table {
+      width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;
+    }
+    .config-table th {
+      background: #f5f5f7; text-align: left; padding: 8px 12px;
+      font-weight: 600; color: #333; border-bottom: 1px solid #ddd;
+    }
+    .config-table td { padding: 8px 12px; border-bottom: 1px solid #eee; color: #444; }
+    .config-table tr:last-child td { border-bottom: none; }
+
+    .doc-section-title {
+      font-size: 22px; font-weight: 700; color: #1c1c1e;
+      margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid #007aff;
+    }
+
+    .doc-section-subtitle { font-size: 16px; font-weight: 600; color: #333; margin-top: 20px; margin-bottom: 10px; }
+
+    /* === Séparateur entre sections === */
+    .section-divider {
+      max-width: 800px;
+      margin: 0 auto 24px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #007aff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 8px 0;
+    }
+
+    /* === Sidebar actions (droite) === */
+    .actions-sidebar {
+      width: var(--sidebar-width);
+      height: calc(100vh - 56px); height: calc(100dvh - 56px);
+      background: var(--glass-strong);
+      backdrop-filter: blur(40px) saturate(180%);
+      -webkit-backdrop-filter: blur(40px) saturate(180%);
+      border-left: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .actions-scroll {
+      flex: 1; overflow-y: auto; padding: 16px 20px 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .actions-scroll::-webkit-scrollbar { display: none; }
+
+    .section-heading { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .section-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
+
+    .info-card {
+      background: var(--bg); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 12px;
+    }
+    .info-card h4 {
+      font-size: 11px; font-weight: 600; color: var(--text-secondary);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;
+    }
+    .info-line {
+      display: flex; justify-content: space-between;
+      padding: 6px 0; border-bottom: 1px solid var(--separator); font-size: 13px;
+    }
+    .info-line:last-child { border-bottom: none; }
+    .info-line .il-label { color: var(--text-secondary); }
+    .info-line .il-value { color: var(--text); font-weight: 600; }
+    .info-line .il-value.ttc { color: var(--primary); font-size: 16px; }
+
+    .actions-footer {
+      padding: 12px 20px;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+      border-top: 1px solid var(--separator);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .actions-footer .btn-row { display: flex; gap: 10px; }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar (ADR-003) -->
+  <nav class="topbar">
+    <button class="topbar-back" onclick="goBack()" title="Retour">
+      <svg viewBox="0 0 8 14"><polyline points="7,1 1,7 7,13"/></svg>
+    </button>
+    <div class="topbar-breadcrumb" id="topbarBreadcrumb">
+      <a href="index.html">iCollectivites</a>
+      <span class="tb-sep">&#9656;</span>
+      <a href="catalogue.html?besoin=columbarium">Columbarium</a>
+      <span class="tb-sep">&#9656;</span>
+      <a href="devis.html">Devis</a>
+      <span class="tb-sep">&#9656;</span>
+      <span class="tb-active">Dossier</span>
+    </div>
+    <a class="topbar-logo" href="index.html">CIMTEA</a>
+  </nav>
+
+  <!-- ========== Document (gauche) ========== -->
+  <div class="doc-panel" id="docPanel">
+
+    <!-- PAGES PDF ORIGINALES : 1 à 34 (avant le devis) -->
+    <!-- Générées dynamiquement par JS -->
+
+    <!-- PAGE DYNAMIQUE : Visuel 3D du projet configuré -->
+    <div class="section-divider" id="dividerVisuel">&#9660; Votre projet configur&eacute; &#9660;</div>
+
+    <div class="doc-page" id="pageVisuel">
+      <div class="doc-page-inner">
+        <h2 class="doc-section-title">Visuel du projet</h2>
+        <div class="doc-monument-wrapper">
+          <div class="doc-monument-placeholder" id="monumentPlaceholder">&#9881; Chargement du rendu 3D…</div>
+          <img id="monumentImage" src="" alt="Rendu 3D du columbarium" style="display:none;max-height:400px;margin:0 auto;">
+        </div>
+        <h3 class="doc-section-subtitle">R&eacute;capitulatif de la configuration</h3>
+        <table class="config-table">
+          <thead><tr><th>&Eacute;l&eacute;ment</th><th>Choix</th></tr></thead>
+          <tbody id="configTableBody"></tbody>
+        </table>
+        <div class="doc-footer">
+          <span>CIMTEA — 65, rue Hirschauer — 57500 Saint-Avold</span>
+          <span>www.cimtea.com</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE DYNAMIQUE : Devis chiffré -->
+    <div class="doc-page" id="pageDevis">
+      <div class="doc-page-inner">
+        <div class="devis-header">
+          <div>
+            <div class="devis-ref" id="devisRef">Devis</div>
+            <div class="devis-date" id="devisDate"></div>
+            <div class="interlocuteur">
+              <strong>Votre interlocuteur</strong><br>
+              LEVY J&eacute;r&eacute;mie<br>
+              06.88.79.28.41
+            </div>
+          </div>
+          <div>
+            <div class="client-info" id="clientInfo"></div>
+          </div>
+        </div>
+
+        <table class="devis-table">
+          <thead>
+            <tr><th>Description</th><th>Qt&eacute;</th><th>PU HT</th><th>Rem.</th><th>Montant</th></tr>
+          </thead>
+          <tbody id="devisTableBody"></tbody>
+        </table>
+
+        <div class="devis-totals">
+          <table id="devisTotals"></table>
+        </div>
+
+        <div class="conditions-box">
+          <h5>Conditions de r&egrave;glement</h5>
+          <p>Solde &agrave; 45 jours. Paiement par traite, virement, ch&egrave;que ou mandat administratif.</p>
+          <p style="margin-top:8px;font-weight:600;color:#333">Dans le cas d'un accord, nous renvoyer le pr&eacute;sent devis sign&eacute; avec la mention "BON POUR COMMANDE".</p>
+          <p style="margin-top:4px;font-size:12px;color:#888">La livraison est comprise dans les tarifs ci-dessus.</p>
+        </div>
+
+        <div class="doc-footer">
+          <span>CIMTEA — SARL au capital de 8 000 euros — SIREN : 444 587 265</span>
+          <span>www.cimtea.com</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider">&#9660; Suite du dossier CIMTEA &#9660;</div>
+
+    <!-- PAGES PDF ORIGINALES : 36 à 46 (après le devis) -->
+    <!-- Générées dynamiquement par JS -->
+
+  </div><!-- /doc-panel -->
+
+  <!-- ========== Sidebar (droite) ========== -->
+  <div class="actions-sidebar">
+    <div class="actions-scroll">
+      <h2 class="section-heading">Dossier devis</h2>
+      <p class="section-sub" id="sidebarProjectName">—</p>
+
+      <div class="info-card">
+        <h4>R&eacute;sum&eacute; financier</h4>
+        <div class="info-line">
+          <span class="il-label">Sous-total HT</span>
+          <span class="il-value" id="sideHT">—</span>
+        </div>
+        <div class="info-line">
+          <span class="il-label">Remise</span>
+          <span class="il-value" id="sideRemise">0 %</span>
+        </div>
+        <div class="info-line">
+          <span class="il-label">TVA (20 %)</span>
+          <span class="il-value" id="sideTVA">—</span>
+        </div>
+        <div class="info-line">
+          <span class="il-label">Total TTC</span>
+          <span class="il-value ttc" id="sideTTC">—</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h4>Client</h4>
+        <div class="info-line">
+          <span class="il-label">Nom</span>
+          <span class="il-value" id="sideClient">—</span>
+        </div>
+        <div class="info-line">
+          <span class="il-label">Commune</span>
+          <span class="il-value" id="sideCommune">—</span>
+        </div>
+        <div class="info-line">
+          <span class="il-label">R&eacute;f&eacute;rence</span>
+          <span class="il-value" id="sideRef">—</span>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h4>Navigation</h4>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.5">
+          Scrollez le document &agrave; gauche pour parcourir le dossier complet (46 pages).
+          Le devis chiffr&eacute; et le visuel 3D sont g&eacute;n&eacute;r&eacute;s selon votre configuration.
+        </p>
+      </div>
+    </div>
+
+    <div class="actions-footer">
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="goBack()" title="Retour au devis">
+          <svg viewBox="0 0 12 18"><polyline points="10,2 2,9 10,16"/></svg>
+        </button>
+        <button class="btn btn-primary" onclick="goToEnvoi()">
+          Passer &agrave; l'envoi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="shared.js"></script>
+  <script>
+    // ==================== PRIX FICTIFS (en attente US-010) ====================
+
+    var PRIX = {
+      'module_3':    { label: 'Module columbarium 3 cases',  pu: 2850 },
+      'module_6':    { label: 'Module columbarium 6 cases',  pu: 4200 },
+      'module_9':    { label: 'Module columbarium 9 cases',  pu: 5800 },
+      'banc':        { label: 'Banc de recueillement',       pu: 950 },
+      'banc_jardin': { label: 'Banc jardinière',             pu: 1250 },
+      'idealo':      { label: 'Élément IDEALO central',     pu: 1800 },
+      'recueillement':{ label: 'Espace de recueillement',   pu: 1400 },
+      'carreaux':    { label: 'Carreaux de sol',             pu: 450 },
+      'forfait_facile':   { label: 'Forfait pose — Terrain facile',   pu: 1200 },
+      'forfait_normal':   { label: 'Forfait pose — Terrain normal',   pu: 1800 },
+      'forfait_difficile':{ label: 'Forfait pose — Terrain difficile', pu: 2600 }
+    };
+
+    // Pages PDF AVANT le devis (pages 1-28, on saute 29-32 = devis originaux remplacés)
+    var PAGES_BEFORE = [];
+    for (var i = 1; i <= 28; i++) {
+      PAGES_BEFORE.push('assets/dossier/page_' + String(i).padStart(2, '0') + '.png');
+    }
+
+    // Pages PDF APRÈS le devis (pages 33-46, suite du dossier)
+    var PAGES_AFTER = [];
+    for (var i = 33; i <= 46; i++) {
+      PAGES_AFTER.push('assets/dossier/page_' + String(i).padStart(2, '0') + '.png');
+    }
+
+    // ==================== INJECTER PAGES PDF ====================
+
+    /** Applique flou + filigrane directement dans les pixels de l'image */
+    function burnWatermark(img) {
+      var canvas = document.createElement('canvas');
+      var ctx = canvas.getContext('2d');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+
+      // Dessiner l'image floutée
+      ctx.filter = 'blur(1px)';
+      ctx.drawImage(img, 0, 0);
+      ctx.filter = 'none';
+
+      // Filigrane en diagonale
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(-35 * Math.PI / 180);
+      ctx.font = '900 ' + Math.round(canvas.width * 0.1) + 'px sans-serif';
+      ctx.fillStyle = 'rgba(251, 153, 16, 0.25)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.letterSpacing = '8px';
+      ctx.fillText('CONFIDENTIEL', 0, 0);
+      ctx.restore();
+
+      // Remplacer le src par le canvas
+      img.src = canvas.toDataURL('image/jpeg', 0.85);
+    }
+
+    /** Insère les pages PDF comme images dans le document */
+    function injectPdfPages() {
+      var panel = document.getElementById('docPanel');
+      var dividerVisuel = document.getElementById('dividerVisuel');
+
+      // Pages avant le devis
+      PAGES_BEFORE.forEach(function(src) {
+        var page = document.createElement('div');
+        page.className = 'doc-page static';
+        var img = document.createElement('img');
+        img.alt = 'Page du dossier CIMTEA';
+        img.onload = function() { burnWatermark(this); };
+        img.src = src;
+        page.appendChild(img);
+        panel.insertBefore(page, dividerVisuel);
+      });
+
+      // Pages après le devis (à la fin)
+      PAGES_AFTER.forEach(function(src) {
+        var page = document.createElement('div');
+        page.className = 'doc-page static';
+        var img = document.createElement('img');
+        img.alt = 'Page du dossier CIMTEA';
+        img.onload = function() { burnWatermark(this); };
+        img.src = src;
+        page.appendChild(img);
+        panel.appendChild(page);
+      });
+    }
+
+    // ==================== FONCTIONS UTILITAIRES ====================
+
+    function generateDevisRef() {
+      var now = new Date();
+      var hex = Math.floor(Math.random() * 0xFFFFF).toString(16).padStart(5, '0');
+      return 'DEV-' + String(now.getFullYear()).slice(2) +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0') + '-' + hex;
+    }
+
+    function formatEuro(n) {
+      return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + ' €';
+    }
+
+    // ==================== RENDU CONFIGURATION ====================
+
+    function renderConfigTable(config) {
+      if (!config) return;
+      var labels = config.labels || {};
+      var l = function(v) { return labels[v] || v || '—'; };
+      var rows = [];
+
+      rows.push(['Disposition', l(config.disposition)]);
+      rows.push(['Module droit', l(config.moduleDroit)]);
+      if (config.moduleGauche && config.moduleGauche !== 'aucun')
+        rows.push(['Module gauche', l(config.moduleGauche)]);
+      if (config.bancDroit && config.bancDroit !== 'aucun')
+        rows.push(['Banc droit', l(config.bancDroit)]);
+      if (config.bancGauche && config.bancGauche !== 'aucun')
+        rows.push(['Banc gauche', l(config.bancGauche)]);
+      if (config.recueillement && config.recueillement !== 'aucun')
+        rows.push(['Recueillement', l(config.recueillement)]);
+      if (config.granits) {
+        var gLabels = { 2: 'Module droit', 3: 'Module gauche', 5: 'Banc droit', 6: 'Banc gauche', 7: 'Recueillement' };
+        [2, 3, 5, 6, 7].forEach(function(s) {
+          if (config.granits[s]) rows.push(['Granit — ' + gLabels[s], l(config.granits[s])]);
+        });
+      }
+      if (config.portes && typeof config.portes === 'object') {
+        [2, 3].forEach(function(s) {
+          if (config.portes[s]) rows.push(['Portes — ' + (s === 2 ? 'Module droit' : 'Module gauche'), l(config.portes[s])]);
+        });
+      }
+      if (config.carreaux) rows.push(['Carreaux de sol', l(config.carreaux)]);
+
+      var html = '';
+      rows.forEach(function(r) { html += '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; });
+      document.getElementById('configTableBody').innerHTML = html;
+    }
+
+    // ==================== RENDU DEVIS CHIFFRÉ ====================
+
+    function getModulePriceKey(v) {
+      if (!v || v === 'aucun') return null;
+      if (v.indexOf('6') !== -1) return 'module_6';
+      if (v.indexOf('9') !== -1) return 'module_9';
+      return 'module_3';
+    }
+
+    function getBancPriceKey(v) {
+      if (!v || v === 'aucun') return null;
+      if (v.indexOf('jardin') !== -1) return 'banc_jardin';
+      return 'banc';
+    }
+
+    function buildDevisLines(config, devis) {
+      var lines = [];
+      var labels = (config && config.labels) || {};
+      var l = function(v) { return labels[v] || v || ''; };
+      var remiseRate = devis ? (parseFloat(devis.remise) || 0) / 100 : 0;
+
+      var mkd = getModulePriceKey(config.moduleDroit);
+      if (mkd && PRIX[mkd]) lines.push({ desc: PRIX[mkd].label, detail: 'Granit : ' + l(config.granits && config.granits[2] || '') + ' — Portes : ' + l(config.portes && config.portes[2] || ''), qty: 1, pu: PRIX[mkd].pu, remise: remiseRate });
+
+      var mkg = getModulePriceKey(config.moduleGauche);
+      if (mkg && PRIX[mkg]) lines.push({ desc: PRIX[mkg].label + ' (gauche)', detail: 'Granit : ' + l(config.granits && config.granits[3] || '') + ' — Portes : ' + l(config.portes && config.portes[3] || ''), qty: 1, pu: PRIX[mkg].pu, remise: remiseRate });
+
+      var bkd = getBancPriceKey(config.bancDroit);
+      if (bkd && PRIX[bkd]) lines.push({ desc: PRIX[bkd].label + ' (droit)', detail: 'Granit : ' + l(config.granits && config.granits[5] || ''), qty: 1, pu: PRIX[bkd].pu, remise: remiseRate });
+
+      var bkg = getBancPriceKey(config.bancGauche);
+      if (bkg && PRIX[bkg]) lines.push({ desc: PRIX[bkg].label + ' (gauche)', detail: 'Granit : ' + l(config.granits && config.granits[6] || ''), qty: 1, pu: PRIX[bkg].pu, remise: remiseRate });
+
+      if (config.disposition && config.disposition.indexOf('idealo') !== -1)
+        lines.push({ desc: PRIX.idealo.label, detail: '', qty: 1, pu: PRIX.idealo.pu, remise: remiseRate });
+
+      if (config.recueillement && config.recueillement !== 'aucun')
+        lines.push({ desc: PRIX.recueillement.label, detail: 'Granit : ' + l(config.granits && config.granits[7] || ''), qty: 1, pu: PRIX.recueillement.pu, remise: remiseRate });
+
+      if (config.carreaux && config.carreaux !== 'aucun')
+        lines.push({ desc: PRIX.carreaux.label, detail: l(config.carreaux), qty: 1, pu: PRIX.carreaux.pu, remise: remiseRate });
+
+      var forfaitKey = 'forfait_' + (devis ? devis.forfait || 'facile' : 'facile');
+      if (PRIX[forfaitKey]) lines.push({ desc: PRIX[forfaitKey].label, detail: '', qty: 1, pu: PRIX[forfaitKey].pu, remise: 0 });
+
+      return lines;
+    }
+
+    function renderDevisTable(config, devis) {
+      var lines = buildDevisLines(config, devis);
+      var remiseRate = devis ? (parseFloat(devis.remise) || 0) : 0;
+
+      var ref = generateDevisRef();
+      var now = new Date();
+      var dateStr = String(now.getDate()).padStart(2, '0') + '/' + String(now.getMonth() + 1).padStart(2, '0') + '/' + now.getFullYear();
+      document.getElementById('devisRef').textContent = 'Devis — ' + ref;
+      document.getElementById('devisDate').textContent = 'Date : ' + dateStr;
+
+      var clientHtml = '';
+      if (devis) {
+        clientHtml = '<strong>' + (devis.commune ? 'MAIRIE DE ' + devis.commune.toUpperCase() : '') + '</strong>';
+        if (devis.nomClient) clientHtml += '<br>' + devis.nomClient;
+        if (devis.email) clientHtml += '<br>' + devis.email;
+      }
+      document.getElementById('clientInfo').innerHTML = clientHtml;
+
+      var totalHT = 0;
+      var bodyHtml = '';
+      lines.forEach(function(line) {
+        var montant = line.qty * line.pu * (1 - line.remise);
+        totalHT += montant;
+        bodyHtml += '<tr><td>' + line.desc + (line.detail ? '<br><span class="line-desc">' + line.detail + '</span>' : '') + '</td>' +
+          '<td>' + line.qty + '</td><td>' + formatEuro(line.pu) + '</td>' +
+          '<td>' + (line.remise > 0 ? (line.remise * 100).toFixed(0) + ' %' : '') + '</td>' +
+          '<td>' + formatEuro(montant) + '</td></tr>';
+      });
+      document.getElementById('devisTableBody').innerHTML = bodyHtml;
+
+      var totalRemise = remiseRate > 0 ? totalHT * remiseRate / (100 - remiseRate) : 0;
+      var totalBrut = totalHT + totalRemise;
+      var tva = totalHT * 0.20;
+      var ttc = totalHT + tva;
+
+      var totalsHtml = '';
+      if (remiseRate > 0) {
+        totalsHtml += '<tr><td>Sous-total brut HT</td><td>' + formatEuro(totalBrut) + '</td></tr>';
+        totalsHtml += '<tr><td>Remise (' + remiseRate + ' %)</td><td>- ' + formatEuro(totalRemise) + '</td></tr>';
+      }
+      totalsHtml += '<tr><td>Montant HT</td><td>' + formatEuro(totalHT) + '</td></tr>';
+      totalsHtml += '<tr><td>TVA (20 %)</td><td>' + formatEuro(tva) + '</td></tr>';
+      totalsHtml += '<tr class="total-ttc"><td>Montant TTC</td><td>' + formatEuro(ttc) + '</td></tr>';
+      document.getElementById('devisTotals').innerHTML = totalsHtml;
+
+      document.getElementById('sideHT').textContent = formatEuro(totalHT);
+      document.getElementById('sideRemise').textContent = remiseRate > 0 ? remiseRate + ' %' : '0 %';
+      document.getElementById('sideTVA').textContent = formatEuro(tva);
+      document.getElementById('sideTTC').textContent = formatEuro(ttc);
+    }
+
+    // ==================== SIDEBAR ====================
+
+    function renderSidebarInfos(devis) {
+      if (!devis) return;
+      document.getElementById('sidebarProjectName').textContent = (devis.nomProjet || '—') + ' — ' + (devis.commune || '');
+      document.getElementById('sideClient').textContent = devis.nomClient || '—';
+      document.getElementById('sideCommune').textContent = devis.commune || '—';
+      document.getElementById('sideRef').textContent = devis.reference || '—';
+    }
+
+    // ==================== NAVIGATION ====================
+
+    function goBack() { window.location.href = 'devis.html'; }
+    function goToEnvoi() { window.location.href = 'envoi.html'; }
+
+    // ==================== INIT ====================
+
+    var config = loadConfig();
+    var devis = loadDevis();
+
+    if (!config || !devis) {
+      window.location.href = 'index.html';
+    }
+
+    injectPdfPages();
+    renderConfigTable(config);
+    renderDevisTable(config, devis);
+    renderSidebarInfos(devis);
+    loadMonumentImage(config, 'monumentImage', 'monumentPlaceholder', '#monumentPlaceholder');
+
+    // Scroll vers le devis dynamique après chargement des pages
+    setTimeout(function() {
+      var panel = document.getElementById('docPanel');
+      var target = document.getElementById('dividerVisuel');
+      panel.scrollTop = target.offsetTop - panel.offsetTop - 24;
+    }, 100);
+  </script>
+
+</body>
+</html>
