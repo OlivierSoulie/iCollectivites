@@ -529,6 +529,14 @@
 
     /** Validate and navigate to envoi page */
     function generateDevis() {
+      const commune = document.getElementById('inputCommune').value.trim();
+      if (!commune) {
+        document.getElementById('inputCommune').classList.add('invalid');
+        document.getElementById('inputCommune').focus();
+        showToast('Veuillez renseigner la commune');
+        return;
+      }
+
       const nomClient = document.getElementById('inputNomClient').value.trim();
       if (!nomClient) {
         document.getElementById('inputNomClient').classList.add('invalid');
@@ -542,14 +550,6 @@
         document.getElementById('inputEmail').classList.add('invalid');
         document.getElementById('inputEmail').focus();
         showToast('Veuillez renseigner un email valide');
-        return;
-      }
-
-      const commune = document.getElementById('inputCommune').value.trim();
-      if (!commune) {
-        document.getElementById('inputCommune').classList.add('invalid');
-        document.getElementById('inputCommune').focus();
-        showToast('Veuillez renseigner la commune');
         return;
       }
 
@@ -597,6 +597,9 @@
         this.classList.remove('invalid');
       });
     });
+
+    // Focus sur le champ Commune au chargement
+    document.getElementById('inputCommune').focus();
   </script>
 
 </body>
